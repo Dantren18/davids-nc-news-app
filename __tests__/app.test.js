@@ -20,24 +20,24 @@ describe("App", () => {
         });
     });
   });
-  describe("/api/topics", () => {
+  describe.only("/api/topics", () => {
     describe("GET Request", () => {
       test("Status 200: response to be an array of objects of length 3", () => {
         return request(app)
           .get("/api/topics")
           .expect(200)
-          .then(({ body }) => {
-            expect(body.length).toEqual(3);
-            expect(typeof body[0]).toEqual("object");
-            expect(Array.isArray(body)).toEqual(true);
+          .then(({ body: { rows } }) => {
+            expect(rows.length).toEqual(3);
+            expect(typeof rows[0]).toEqual("object");
+            expect(Array.isArray(rows)).toEqual(true);
           });
       });
       test("Each object in the array should have the keys of slug and description. Ttheir values should be strings", () => {
         return request(app)
           .get("/api/topics")
           .expect(200)
-          .then(({ body }) => {
-            body.forEach((topic) => {
+          .then(({ body: { rows } }) => {
+            rows.forEach((topic) => {
               expect(topic).toEqual(
                 expect.objectContaining({
                   description: expect.any(String),
@@ -51,7 +51,7 @@ describe("App", () => {
         return request(app)
           .get("/api/topics")
           .expect(200)
-          .then(({ body }) => {
+          .then(({ body: { rows } }) => {
             const topics = [
               {
                 description: "The man, the Mitch, the legend",
@@ -66,9 +66,17 @@ describe("App", () => {
                 slug: "paper",
               },
             ];
-            expect(body).toEqual(topics);
+            expect(rows).toEqual(topics);
           });
       });
+    });
+  });
+  describe("GET /api/articles/:article:id", () => {
+    test("Should return yahdsahdsa", () => {
+      return request(app)
+        .get("/api/articles/1")
+        .expect(200)
+        .then(({ body }) => {});
     });
   });
 });
