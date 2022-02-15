@@ -10,7 +10,10 @@ exports.getTopicsController = (req, res) => {
 
 exports.getArticleByIDController = (req, res) => {
   let id = req.params.article_id;
-  getArticleByIDModel(id).then((articles) => {
-    res.status(200).send(articles);
-  });
+  getArticleByIDModel(id)
+    .then((articles) => {
+      console.log(articles, "articles in controller");
+      res.status(200).send({ articles });
+    })
+    .catch((err) => next(err));
 };

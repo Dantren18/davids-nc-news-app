@@ -37,7 +37,6 @@ describe("App", () => {
           .get("/api/topics")
           .expect(200)
           .then(({ body: { topics } }) => {
-            console.log(topics, "TOPICS HERE");
             topics.forEach((topic) => {
               expect(topic).toEqual(
                 expect.objectContaining({
@@ -70,6 +69,73 @@ describe("App", () => {
             expect(topics).toEqual(topicsData);
           });
       });
+    });
+  });
+  describe("GET /api/articles/:article_id", () => {});
+  describe("Should return an article object with correct properties", () => {
+    test("Item should be object of length 7 in an array", () => {
+      return request(app)
+        .get("/api/articles/1")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles.length).toEqual(1);
+          expect(Object.keys(articles[0]).length).toEqual(7);
+          expect(typeof articles[0]).toEqual("object");
+        });
+    });
+    test("Item should have correct keys", () => {
+      return request(app)
+        .get("/api/articles/1")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          articles.forEach((article) => {
+            expect(article).toEqual(
+              expect.objectContaining({
+                article_id: expect.any(Number),
+                author: expect.any(String),
+                body: expect.any(String),
+                created_at: expect.any(String),
+                title: expect.any(String),
+                topic: expect.any(String),
+                votes: expect.any(Number),
+              })
+            );
+          });
+        });
+    });
+  });
+  describe("Should return correct article data for given ID", () => {
+    test("Correct data should be returned for ID 1", () => {
+      return request(app)
+        .get("/api/articles/1")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles[0]).toEqual({
+            article_id: 1,
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: "2020-07-09T21:11:00.000Z",
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            votes: 100,
+          });
+        });
+    });
+    test("Correct data should be returned for ID 3", () => {
+      return request(app)
+        .get("/api/articles/3")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles[0]).toEqual({
+            article_id: 3,
+            author: "icellusedkars",
+            body: "some gifs",
+            created_at: "2020-11-03T09:12:00.000Z",
+            title: "Eight pug gifs that remind me of mitch",
+            topic: "mitch",
+            votes: 0,
+          });
+        });
     });
   });
 });
