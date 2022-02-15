@@ -20,24 +20,25 @@ describe("App", () => {
         });
     });
   });
-  describe.only("/api/topics", () => {
+  describe("/api/topics", () => {
     describe("GET Request", () => {
       test("Status 200: response to be an array of objects of length 3", () => {
         return request(app)
           .get("/api/topics")
           .expect(200)
-          .then(({ body: { rows } }) => {
-            expect(rows.length).toEqual(3);
-            expect(typeof rows[0]).toEqual("object");
-            expect(Array.isArray(rows)).toEqual(true);
+          .then(({ body: { topics } }) => {
+            expect(topics.length).toEqual(3);
+            expect(typeof topics[0]).toEqual("object");
+            expect(Array.isArray(topics)).toEqual(true);
           });
       });
       test("Each object in the array should have the keys of slug and description. Ttheir values should be strings", () => {
         return request(app)
           .get("/api/topics")
           .expect(200)
-          .then(({ body: { rows } }) => {
-            rows.forEach((topic) => {
+          .then(({ body: { topics } }) => {
+            console.log(topics, "TOPICS HERE");
+            topics.forEach((topic) => {
               expect(topic).toEqual(
                 expect.objectContaining({
                   description: expect.any(String),
@@ -51,8 +52,8 @@ describe("App", () => {
         return request(app)
           .get("/api/topics")
           .expect(200)
-          .then(({ body: { rows } }) => {
-            const topics = [
+          .then(({ body: { topics } }) => {
+            const topicsData = [
               {
                 description: "The man, the Mitch, the legend",
                 slug: "mitch",
@@ -66,17 +67,9 @@ describe("App", () => {
                 slug: "paper",
               },
             ];
-            expect(rows).toEqual(topics);
+            expect(topics).toEqual(topicsData);
           });
       });
-    });
-  });
-  describe("GET /api/articles/:article:id", () => {
-    test("Should return yahdsahdsa", () => {
-      return request(app)
-        .get("/api/articles/1")
-        .expect(200)
-        .then(({ body }) => {});
     });
   });
 });
