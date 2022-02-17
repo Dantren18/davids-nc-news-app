@@ -17,7 +17,7 @@ exports.getArticleByIDController = (req, res, next) => {
   let id = req.params.article_id;
   getArticleByIDModel(id)
     .then((articles) => {
-      res.status(200).send({ articles });
+      res.status(200).send(articles[0]);
     })
     .catch((err) => next(err));
 };
@@ -27,10 +27,7 @@ exports.patchArticleByIdController = (req, res, next) => {
   const newVote = req.body;
   updateArticleByIdModel(article_id, newVote)
     .then((articles) => {
-      const article = articles.find(
-        (article) => article.article_id === Number.parseInt(article_id)
-      );
-      res.status(200).send({ article });
+      res.status(200).send(articles[0]);
     })
     .catch((err) => {
       next(err);
@@ -40,7 +37,6 @@ exports.patchArticleByIdController = (req, res, next) => {
 exports.getUsersController = (req, res, next) => {
   getUsersModel()
     .then((users) => {
-      console.log(users, "users in controller");
       res.status(200).send({ users });
     })
     .catch((err) => next(err));

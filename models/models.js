@@ -7,11 +7,15 @@ exports.getTopicsModel = () => {
 };
 
 exports.getArticleByIDModel = (id) => {
+  if (isNaN(id)) {
+    return Promise.reject({ status: 400, msg: "Invalid ID" });
+  }
   return db
     .query(`SELECT *  from articles WHERE article_id = $1;`, [id])
     .then((result) => {
-      console.log(result.rows, "RESULT HERE");
-      return result.rows;
+      if (result.rows.length != 0) {
+        return result.rows;
+      } else return Promise.reject({ status: 404, msg: "ID Doesn't Exist" });
     });
 };
 
@@ -33,13 +37,11 @@ exports.updateArticleByIdModel = (article_id, newVote) => {
   }
 
   return db
-    .query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
-    .then((result) => {
-      return db.query(
-        `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *;`,
-        [newVote.inc_votes, article_id]
-      );
-    })
+    .query(
+      `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *;`,
+      [newVote.inc_votes, article_id]
+    )
+
     .then(({ rows }) => rows);
 };
 
