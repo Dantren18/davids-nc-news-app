@@ -69,7 +69,7 @@ describe("App", () => {
         });
     });
   });
-  describe.only("GET /api/articles/:article_id", () => {
+  describe("GET /api/articles/:article_id", () => {
     describe("Status 400: bad request", () => {
       test("Should recieve a status 400 error message when inputting an invalid article id", () => {
         return request(app)
