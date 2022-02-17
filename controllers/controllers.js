@@ -1,4 +1,10 @@
-const { getTopicsModel, getArticleByIDModel } = require("../models/models.js");
+const {
+  getTopicsModel,
+  getArticleByIDModel,
+  patchArticleByIDModel,
+} = require("../models/models.js");
+
+const db = require("../db/connection");
 
 exports.getTopicsController = (req, res) => {
   getTopicsModel()
@@ -8,9 +14,15 @@ exports.getTopicsController = (req, res) => {
     .catch((err) => next(err));
 };
 
-exports.getArticleByIDController = (req, res) => {
+exports.getArticleByIDController = (req, res, next) => {
   let id = req.params.article_id;
-  getArticleByIDModel(id).then((articles) => {
-    res.status(200).send(articles);
-  });
+  getArticleByIDModel(id)
+    .then((articles) => {
+      res.status(200).send({ articles });
+    })
+    .catch((err) => next(err));
+};
+
+exports.patchArticleByIDController = (req, res) => {
+  console.log(req.params, "request here");
 };
