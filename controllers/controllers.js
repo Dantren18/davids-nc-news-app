@@ -19,7 +19,9 @@ exports.getArticleByIDController = (req, res, next) => {
     .then((articles) => {
       res.status(200).send(articles[0]);
     })
-    .catch((err) => next(err));
+    .catch((err) => {
+      next(err);
+    });
 };
 
 exports.patchArticleByIdController = (req, res, next) => {

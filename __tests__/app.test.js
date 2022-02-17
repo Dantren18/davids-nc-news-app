@@ -76,7 +76,7 @@ describe("App", () => {
           .get("/api/articles/sausages")
           .expect(400)
           .then((res) => {
-            expect(res.text).toEqual("Bad Request");
+            expect(res.body.msg).toEqual("Invalid ID");
           });
       });
     });
@@ -86,7 +86,7 @@ describe("App", () => {
           .get("/api/articles/999999")
           .expect(404)
           .then((res) => {
-            expect(res.text).toEqual("Not Found");
+            expect(res.body.msg).toEqual("ID Doesn't Exist");
           });
       });
     });
@@ -179,7 +179,7 @@ describe("App", () => {
         .send({ inc_votes: "dog" })
         .expect(422)
         .then((res) => {
-          expect(res.text).toBe("Unprocessable Entity");
+          expect(res.body.msg).toBe("Unprocessable Entity");
         });
     });
     test("422 - inc_vote value is not a number in request body", () => {
@@ -187,7 +187,7 @@ describe("App", () => {
         .patch("/api/articles/2")
         .expect(422)
         .then((res) => {
-          expect(res.text).toBe("Unprocessable Entity");
+          expect(res.body.msg).toBe("Unprocessable Entity");
         });
     });
     test("200 - request body includes other unrelated property", () => {

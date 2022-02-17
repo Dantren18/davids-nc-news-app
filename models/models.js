@@ -20,20 +20,19 @@ exports.getArticleByIDModel = (id) => {
 };
 
 exports.updateArticleByIdModel = (article_id, newVote) => {
-  // Validate input parameters
   if (
     !article_id ||
     Number.isNaN(Number.parseInt(article_id)) ||
     Number.parseInt(article_id) <= 0
   ) {
-    return Promise.reject({ status: 400, message: "Bad Request" });
+    return Promise.reject({ status: 400, msg: "Bad Request" });
   }
   if (
     !newVote ||
     !newVote.hasOwnProperty("inc_votes") ||
     Number.isNaN(Number.parseInt(newVote.inc_votes))
   ) {
-    return Promise.reject({ status: 422, message: "Unprocessable Entity" });
+    return Promise.reject({ status: 422, msg: "Unprocessable Entity" });
   }
 
   return db
