@@ -15,6 +15,7 @@ app.get("/api/topics", getTopicsController);
 
 ///API/ARTICLES
 app.get("/api/articles/:article_id", getArticleByIDController);
+app.get("/api/articles", getArticlesController);
 app.patch("/api/articles/:article_id", patchArticleByIdController);
 
 ///API/USERS

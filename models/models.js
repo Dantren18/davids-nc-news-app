@@ -1,10 +1,13 @@
 const db = require("../db/connection");
 
+// TOPICS MODELS
 exports.getTopicsModel = () => {
   return db.query(`SELECT * from topics;`).then((result) => {
     return result.rows;
   });
 };
+
+// ARTICLE MODELS
 
 exports.getArticleByIDModel = (id) => {
   return db
@@ -13,6 +16,12 @@ exports.getArticleByIDModel = (id) => {
       console.log(result.rows, "RESULT HERE");
       return result.rows;
     });
+};
+
+exports.getArticlesModel = () => {
+  return db.query(`SELECT * from articles;`).then((result) => {
+    return result.rows;
+  });
 };
 
 exports.updateArticleByIdModel = (article_id, newVote) => {
@@ -43,6 +52,7 @@ exports.updateArticleByIdModel = (article_id, newVote) => {
     .then(({ rows }) => rows);
 };
 
+//USERS MODELS
 exports.getUsersModel = () => {
   return db.query(`SELECT username from users;`).then((result) => {
     return result.rows;
