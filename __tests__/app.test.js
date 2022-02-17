@@ -141,16 +141,77 @@ describe("App", () => {
     });
   });
   describe.only("PATCH /api/articles/:article_id", () => {
-    describe("Properties of response should be correct", () => {
-      test("Returned item should be a single article with correct properties", () => {
-        return request(app)
-          .patch("/api/articles/1")
-          .send({ inc_votes: 1 })
-          .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles[0]).toEqual();
+    test("200: Should increase vote count by 1 returning update article and 200 status code.", () => {
+      const incVotes = { inc_votes: 1 };
+      return request(app)
+        .patch("/api/articles/3")
+        .send(incVotes)
+        .expect(200)
+        .then((res) => {
+          expect(res.body.article).toEqual({
+            article_id: 3,
+            title: "Eight pug gifs that remind me of mitch",
+            body: "some gifs",
+            votes: 1,
+            topic: "mitch",
+            author: "icellusedkars",
+            created_at: "2020-11-03T09:12:00.000Z",
           });
-      });
+        });
+    });
+    test("200: Should decrease vote count by 1 returning update article and 200 status code", () => {
+      // Arrange
+      const incVotes = { inc_votes: -1 };
+      // Act
+      return request(app)
+        .patch("/api/articles/3")
+        .send(incVotes)
+        .expect(200)
+        .then((res) => {
+          expect(res.body.article).toEqual({
+            article_id: 3,
+            title: "Eight pug gifs that remind me of mitch",
+            body: "some gifs",
+            votes: -1,
+            topic: "mitch",
+            author: "icellusedkars",
+            created_at: "2020-11-03T09:12:00.000Z",
+          });
+        });
+    });
+    test("422 - inc_vote property not included in request body", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: "dog" })
+        .expect(422)
+        .then((res) => {
+          expect(res.text).toBe("Unprocessable Entity");
+        });
+    });
+    test("422 - inc_vote value is not a number in request body", () => {
+      return request(app)
+        .patch("/api/articles/2")
+        .expect(422)
+        .then((res) => {
+          expect(res.text).toBe("Unprocessable Entity");
+        });
+    });
+    test("200 - request body includes other unrelated property", () => {
+      return request(app)
+        .patch("/api/articles/5")
+        .send({ inc_votes: 0, favouritePet: "dogs" })
+        .expect(200)
+        .then((res) => {
+          expect(res.body.article).toEqual({
+            article_id: 5,
+            title: "UNCOVERED: catspiracy to bring down democracy",
+            body: "Bastet walks amongst us, and the cats are taking arms!",
+            votes: 0,
+            topic: "cats",
+            author: "rogersop",
+            created_at: "2020-08-03T14:14:00.000Z",
+          });
+        });
     });
   });
 });

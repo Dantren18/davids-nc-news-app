@@ -1,4 +1,8 @@
-const { getTopicsModel, getArticleByIDModel } = require("../models/models.js");
+const {
+  getTopicsModel,
+  getArticleByIDModel,
+  updateArticleByIdModel,
+} = require("../models/models.js");
 
 exports.getTopicsController = (req, res) => {
   getTopicsModel()
@@ -8,17 +12,26 @@ exports.getTopicsController = (req, res) => {
     .catch((err) => next(err));
 };
 
-exports.getArticleByIDController = (req, res) => {
+exports.getArticleByIDController = (req, res, next) => {
   let id = req.params.article_id;
   getArticleByIDModel(id)
     .then((articles) => {
-      console.log(articles, "articles in controller");
       res.status(200).send({ articles });
     })
     .catch((err) => next(err));
 };
 
-exports.patchArticleByIDController = (req, res) => {
-  let id = req;
-  console.log(id, "id is here");
+exports.patchArticleByIdController = (req, res, next) => {
+  const { article_id } = req.params;
+  const newVote = req.body;
+  updateArticleByIdModel(article_id, newVote)
+    .then((articles) => {
+      const article = articles.find(
+        (article) => article.article_id === Number.parseInt(article_id)
+      );
+      res.status(200).send({ article });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
