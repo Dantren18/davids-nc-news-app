@@ -140,7 +140,7 @@ describe("App", () => {
       });
     });
   });
-  describe.only("PATCH /api/articles/:article_id", () => {
+  describe("PATCH /api/articles/:article_id", () => {
     test("200: Should increase vote count by 1 returning update article and 200 status code.", () => {
       const incVotes = { inc_votes: 1 };
       return request(app)
@@ -211,6 +211,47 @@ describe("App", () => {
             author: "rogersop",
             created_at: "2020-08-03T14:14:00.000Z",
           });
+        });
+    });
+  });
+  describe.only("GET /api/users", () => {
+    test("Status 200: response to be an array of objects of length 3", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body: { users } }) => {
+          console.log(users, "body");
+          expect(users.length).toEqual(4);
+          expect(typeof users[0]).toEqual("object");
+          expect(Array.isArray(users)).toEqual(true);
+        });
+    });
+    test("Each object in the array should have the keys of slug and description. Ttheir values should be strings", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body: { users } }) => {
+          users.forEach((user) => {
+            expect(user).toEqual(
+              expect.objectContaining({
+                username: expect.any(String),
+              })
+            );
+          });
+        });
+    });
+    test("Should return correct data", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body: { users } }) => {
+          const usersData = [
+            { username: "butter_bridge" },
+            { username: "icellusedkars" },
+            { username: "rogersop" },
+            { username: "lurker" },
+          ];
+          expect(users).toEqual(usersData);
         });
     });
   });

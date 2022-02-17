@@ -42,3 +42,9 @@ exports.updateArticleByIdModel = (article_id, newVote) => {
     })
     .then(({ rows }) => rows);
 };
+
+exports.getUsersModel = () => {
+  return db.query(`SELECT username from users;`).then((result) => {
+    return result.rows;
+  });
+};

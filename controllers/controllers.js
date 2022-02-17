@@ -2,9 +2,10 @@ const {
   getTopicsModel,
   getArticleByIDModel,
   updateArticleByIdModel,
+  getUsersModel,
 } = require("../models/models.js");
 
-exports.getTopicsController = (req, res) => {
+exports.getTopicsController = (req, res, next) => {
   getTopicsModel()
     .then((topics) => {
       res.status(200).send({ topics });
@@ -34,4 +35,13 @@ exports.patchArticleByIdController = (req, res, next) => {
     .catch((err) => {
       next(err);
     });
+};
+
+exports.getUsersController = (req, res, next) => {
+  getUsersModel()
+    .then((users) => {
+      console.log(users, "users in controller");
+      res.status(200).send({ users });
+    })
+    .catch((err) => next(err));
 };
