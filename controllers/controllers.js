@@ -17,3 +17,8 @@ exports.getArticleByIDController = (req, res) => {
     })
     .catch((err) => next(err));
 };
+
+exports.patchArticleByIDController = (req, res) => {
+  let id = req;
+  console.log(id, "id is here");
+};
