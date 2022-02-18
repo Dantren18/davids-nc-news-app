@@ -29,14 +29,13 @@ app.all("/*", (req, res) => {
 
 app.use((err, req, res, next) => {
   if (err.status) {
-    res.sendStatus(err.status);
+    res.status(err.status).send(err);
   } else {
     next(err);
   }
 });
 
 app.use((err, req, res, next) => {
-  console.error(err);
   res.status(500).send({ message: "Something Internal Went Wrong" });
 });
 

@@ -28,7 +28,6 @@ exports.getArticlesModel = () => {
 };
 
 exports.updateArticleByIdModel = (article_id, newVote) => {
-  // Validate input parameters
   if (
     !article_id ||
     Number.isNaN(Number.parseInt(article_id)) ||
@@ -46,8 +45,8 @@ exports.updateArticleByIdModel = (article_id, newVote) => {
   console.log("inside controller");
   return db
     .query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
-    .then((rows) => {
-      if ((rows.length = 0)) {
+    .then((result) => {
+      if (result.rows.length === 0) {
         console.log(result, "result is here");
         return Promise.reject({ status: 404, msg: "Not Found" });
       }
