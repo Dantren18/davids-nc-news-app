@@ -137,7 +137,7 @@ describe("App", () => {
     });
   });
   describe("PATCH /api/articles/:article_id", () => {
-    test("200: Should increase vote count by 1 returning update article and 200 status code.", () => {
+    test("Status 200: Should increase vote count by 1 returning update article and 200 status code.", () => {
       const incVotes = { inc_votes: 1 };
       return request(app)
         .patch("/api/articles/3")
@@ -155,7 +155,7 @@ describe("App", () => {
           });
         });
     });
-    test("200: Should decrease vote count by 1 returning update article and 200 status code", () => {
+    test("Status 200: Should decrease vote count by 1 returning update article and 200 status code", () => {
       const incVotes = { inc_votes: -1 };
       return request(app)
         .patch("/api/articles/3")
@@ -173,41 +173,44 @@ describe("App", () => {
           });
         });
     });
-    test("422 - inc_vote property not included in request body", () => {
+    test("Status 400 - inc_vote value is not a number in request body", () => {
       return request(app)
         .patch("/api/articles/1")
         .send({ inc_votes: "dog" })
-        .expect(422)
+        .expect(400)
         .then((res) => {
-          expect(res.body.msg).toBe("Unprocessable Entity");
+          expect(res.body.msg).toBe("Bad Request");
         });
     });
-    test("422 - inc_vote value is not a number in request body", () => {
+    test("Status 400 - inc_vote value is not included in request body", () => {
       return request(app)
         .patch("/api/articles/2")
-        .expect(422)
+        .send({ inc_votes: "" })
+        .expect(400)
         .then((res) => {
-          expect(res.body.msg).toBe("Unprocessable Entity");
+          expect(res.body.msg).toBe("Bad Request");
         });
     });
-    test("200 - request body includes other unrelated property", () => {
+    test("Status 400 - request body includes other unrelated property", () => {
       return request(app)
         .patch("/api/articles/5")
         .send({ inc_votes: 0, favouritePet: "dogs" })
-        .expect(200)
+        .expect(400)
         .then((res) => {
-          expect(res.body).toEqual({
-            article_id: 5,
-            title: "UNCOVERED: catspiracy to bring down democracy",
-            body: "Bastet walks amongst us, and the cats are taking arms!",
-            votes: 0,
-            topic: "cats",
-            author: "rogersop",
-            created_at: "2020-08-03T14:14:00.000Z",
-          });
+          expect(res.body.msg).toEqual("Bad Request");
+        });
+    });
+    test("Status 422 - key is wrong name / spelled incorrectly", () => {
+      return request(app)
+        .patch("/api/articles/5")
+        .send({ inc_votessssss: 1 })
+        .expect(422)
+        .then((res) => {
+          expect(res.body.msg).toEqual("Unprocessable Entity");
         });
     });
   });
+
   describe("GET /api/users", () => {
     test("Status 200: response to be an array of objects of length 3", () => {
       return request(app)

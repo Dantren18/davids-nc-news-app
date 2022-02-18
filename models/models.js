@@ -20,6 +20,9 @@ exports.getArticleByIDModel = (id) => {
 };
 
 exports.updateArticleByIdModel = (article_id, newVote) => {
+  if (Object.keys(newVote).length > 1) {
+    return Promise.reject({ status: 400, msg: "Bad Request" });
+  }
   if (
     !article_id ||
     Number.isNaN(Number.parseInt(article_id)) ||
@@ -27,12 +30,12 @@ exports.updateArticleByIdModel = (article_id, newVote) => {
   ) {
     return Promise.reject({ status: 400, msg: "Bad Request" });
   }
-  if (
-    !newVote ||
-    !newVote.hasOwnProperty("inc_votes") ||
-    Number.isNaN(Number.parseInt(newVote.inc_votes))
-  ) {
+  if (!newVote || !newVote.hasOwnProperty("inc_votes")) {
     return Promise.reject({ status: 422, msg: "Unprocessable Entity" });
+  }
+
+  if (Number.isNaN(Number.parseInt(newVote.inc_votes))) {
+    return Promise.reject({ status: 400, msg: "Bad Request" });
   }
 
   return db
