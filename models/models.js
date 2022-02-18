@@ -19,6 +19,7 @@ exports.getArticleByIDModel = (id) => {
     });
 };
 
+
 exports.updateArticleByIdModel = (article_id, newVote) => {
   if (Object.keys(newVote).length > 1) {
     return Promise.reject({ status: 400, msg: "Bad Request" });
@@ -52,3 +53,4 @@ exports.getUsersModel = () => {
     return result.rows;
   });
 };
+
