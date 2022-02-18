@@ -54,7 +54,6 @@ exports.patchArticleByIdController = (req, res, next) => {
 exports.getUsersController = (req, res, next) => {
   getUsersModel()
     .then((users) => {
-      console.log(users, "users in controller");
       res.status(200).send({ users });
     })
     .catch((err) => next(err));

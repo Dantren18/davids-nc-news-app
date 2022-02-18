@@ -34,18 +34,24 @@ exports.updateArticleByIdModel = (article_id, newVote) => {
     Number.isNaN(Number.parseInt(article_id)) ||
     Number.parseInt(article_id) <= 0
   ) {
-    return Promise.reject({ status: 400, message: "Bad Request" });
+    return Promise.reject({ status: 400, msg: "Bad Request" });
   }
   if (
     !newVote ||
     !newVote.hasOwnProperty("inc_votes") ||
     Number.isNaN(Number.parseInt(newVote.inc_votes))
   ) {
-    return Promise.reject({ status: 422, message: "Unprocessable Entity" });
+    return Promise.reject({ status: 422, msg: "Unprocessable Entity" });
   }
-
+  console.log("inside controller");
   return db
     .query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
+    .then((rows) => {
+      if ((rows.length = 0)) {
+        console.log(result, "result is here");
+        return Promise.reject({ status: 404, msg: "Not Found" });
+      }
+    })
     .then((result) => {
       return db.query(
         `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *;`,

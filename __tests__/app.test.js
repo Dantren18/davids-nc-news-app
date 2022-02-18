@@ -3,7 +3,6 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data/index");
 const request = require("supertest");
-const { expect } = require("@jest/globals");
 const jestSorted = require("jest-sorted");
 
 afterAll(() => db.end());
@@ -143,7 +142,7 @@ describe("App", () => {
     });
   });
   describe("PATCH /api/articles/:article_id", () => {
-    test("200: Should increase vote count by 1 returning update article and 200 status code.", () => {
+    test("Status 200: Should increase vote count by 1 returning update article and 200 status code.", () => {
       const incVotes = { inc_votes: 1 };
       return request(app)
         .patch("/api/articles/3")
@@ -161,7 +160,7 @@ describe("App", () => {
           });
         });
     });
-    test("200: Should decrease vote count by 1 returning update article and 200 status code", () => {
+    test("Status 200: Should decrease vote count by 1 returning update article and 200 status code", () => {
       // Arrange
       const incVotes = { inc_votes: -1 };
       // Act
@@ -181,7 +180,7 @@ describe("App", () => {
           });
         });
     });
-    test("422 - inc_vote property not included in request body", () => {
+    test("Status 422 - inc_vote property not included in request body", () => {
       return request(app)
         .patch("/api/articles/1")
         .send({ inc_votes: "dog" })
@@ -190,7 +189,7 @@ describe("App", () => {
           expect(res.text).toBe("Unprocessable Entity");
         });
     });
-    test("422 - inc_vote value is not a number in request body", () => {
+    test("Status 422 - inc_vote value is not a number in request body", () => {
       return request(app)
         .patch("/api/articles/2")
         .expect(422)
@@ -198,7 +197,7 @@ describe("App", () => {
           expect(res.text).toBe("Unprocessable Entity");
         });
     });
-    test("200 - request body includes other unrelated property", () => {
+    test("Status 200 - request body includes other unrelated property", () => {
       return request(app)
         .patch("/api/articles/5")
         .send({ inc_votes: 0, favouritePet: "dogs" })
@@ -213,6 +212,32 @@ describe("App", () => {
             author: "rogersop",
             created_at: "2020-08-03T14:14:00.000Z",
           });
+        });
+    });
+    test("Status 404 - patch to an valid article id, but the article doesnt exist", () => {
+      return request(app)
+        .patch("/api/articles/5000000")
+        .send({ inc_votes: 0, favouritePet: "dogs" })
+        .expect(200)
+        .then((res) => {
+          expect(res.body.article).toEqual({
+            article_id: 5,
+            title: "UNCOVERED: catspiracy to bring down democracy",
+            body: "Bastet walks amongst us, and the cats are taking arms!",
+            votes: 0,
+            topic: "cats",
+            author: "rogersop",
+            created_at: "2020-08-03T14:14:00.000Z",
+          });
+        });
+    });
+    test.only("Status 400 - request body includes other unrelated property", () => {
+      return request(app)
+        .patch("/api/articles/sausages")
+        .send({ inc_votes: 0, favouritePet: "dogs" })
+        .expect(400)
+        .then((res) => {
+          expect(res.statusMessage).toEqual("Bad Request");
         });
     });
   });
