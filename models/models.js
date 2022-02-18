@@ -11,14 +11,22 @@ exports.getArticleByIDModel = (id) => {
     return Promise.reject({ status: 400, msg: "Invalid ID" });
   }
   return db
-    .query(`SELECT *  from articles WHERE article_id = $1;`, [id])
+    .query(
+      ` SELECT articles.*,
+        COUNT(comments.article_id) AS comment_count
+        FROM articles
+        INNER JOIN comments
+        ON articles.article_id = comments.article_id
+        WHERE articles.article_id = $1
+        GROUP BY articles.article_id;`,
+      [id]
+    )
     .then((result) => {
       if (result.rows.length != 0) {
         return result.rows;
       } else return Promise.reject({ status: 404, msg: "ID Doesn't Exist" });
     });
 };
-
 
 exports.updateArticleByIdModel = (article_id, newVote) => {
   if (Object.keys(newVote).length > 1) {
@@ -53,4 +61,3 @@ exports.getUsersModel = () => {
     return result.rows;
   });
 };
-

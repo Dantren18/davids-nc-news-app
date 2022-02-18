@@ -96,7 +96,7 @@ describe("App", () => {
           .get("/api/articles/1")
           .expect(200)
           .then(({ body }) => {
-            expect(Object.keys(body).length).toEqual(7);
+            expect(Object.keys(body).length).toEqual(8);
             expect(typeof body).toEqual("object");
           });
       });
@@ -111,6 +111,7 @@ describe("App", () => {
               article_id: 1,
               author: "butter_bridge",
               body: "I find this existence challenging",
+              comment_count: "11",
               created_at: "2020-07-09T21:11:00.000Z",
               title: "Living in the shadow of a great man",
               topic: "mitch",
@@ -127,6 +128,7 @@ describe("App", () => {
               article_id: 3,
               author: "icellusedkars",
               body: "some gifs",
+              comment_count: "2",
               created_at: "2020-11-03T09:12:00.000Z",
               title: "Eight pug gifs that remind me of mitch",
               topic: "mitch",
@@ -210,7 +212,6 @@ describe("App", () => {
         });
     });
   });
-
   describe("GET /api/users", () => {
     test("Status 200: response to be an array of objects of length 3", () => {
       return request(app)
