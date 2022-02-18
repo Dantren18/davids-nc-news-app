@@ -22,7 +22,6 @@ describe("App", () => {
   });
   describe("GET /api/topics", () => {
     test("Status 200: response to be an array of objects of length 3", () => {
-
       return request(app)
         .get("/api/topics")
         .expect(200)
@@ -234,10 +233,8 @@ describe("App", () => {
                 username: expect.any(String),
               })
             );
-
-     
           });
-      });
+        });
     });
     describe("Status 400: bad request", () => {
       test("Should recieve a status 404 error message when inputting an valid article id that doesn't exist", () => {
@@ -249,55 +246,6 @@ describe("App", () => {
           });
       });
     });
-    describe("Should return an article object with correct properties", () => {
-      test("Item should be object of length 7 in an array", () => {
-        return request(app)
-          .get("/api/articles/1")
-          .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles.length).toEqual(1);
-            expect(Object.keys(articles[0]).length).toEqual(7);
-            expect(typeof articles[0]).toEqual("object");
-          });
-      });
-    });
-    describe("Should return correct article data for given ID", () => {
-      test("Correct data should be returned for ID 1", () => {
-        return request(app)
-          .get("/api/articles/1")
-          .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles[0]).toEqual({
-              article_id: 1,
-              author: "butter_bridge",
-              body: "I find this existence challenging",
-              created_at: "2020-07-09T21:11:00.000Z",
-              title: "Living in the shadow of a great man",
-              topic: "mitch",
-              votes: 100,
-            });
-            expect(articles.length).toEqual(1);
-            expect(Object.keys(articles[0]).length).toEqual(7);
-            expect(typeof articles[0]).toEqual("object");
-          });
-      });
-      test("Correct data should be returned for ID 3", () => {
-        return request(app)
-          .get("/api/articles/3")
-          .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles[0]).toEqual({
-              article_id: 3,
-              author: "icellusedkars",
-              body: "some gifs",
-              created_at: "2020-11-03T09:12:00.000Z",
-              title: "Eight pug gifs that remind me of mitch",
-              topic: "mitch",
-              votes: 0,
-            });
-          });
-      });
-    });
   });
   describe("PATCH /api/articles/:article_id", () => {
     describe("Properties of response should be correct", () => {
@@ -306,15 +254,15 @@ describe("App", () => {
           .patch("/api/articles/1")
           .send({ inc_votes: 1 })
           .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles[0]).toEqual({
+          .then((articles) => {
+            expect(articles.body).toEqual({
               article_id: 1,
               author: "butter_bridge",
               body: "I find this existence challenging",
               created_at: "2020-07-09T21:11:00.000Z",
               title: "Living in the shadow of a great man",
               topic: "mitch",
-              votes: 100,
+              votes: 101,
             });
           });
       });
