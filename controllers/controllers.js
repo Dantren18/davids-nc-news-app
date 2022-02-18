@@ -27,7 +27,6 @@ exports.getArticleByIDController = (req, res, next) => {
 };
 
 exports.getArticlesController = (req, res, next) => {
-  console.log("inside controller!");
   getArticlesModel()
     .then((articles) => {
       res.status(200).send({ articles });

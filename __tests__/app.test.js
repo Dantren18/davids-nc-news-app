@@ -4,6 +4,7 @@ const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data/index");
 const request = require("supertest");
 const { expect } = require("@jest/globals");
+const jestSorted = require("jest-sorted");
 
 afterAll(() => db.end());
 
@@ -215,22 +216,18 @@ describe("App", () => {
         });
     });
   });
-  describe.only("GET /api/articles", () => {
-    test("Status 200: response to be an array of objects of length 12", () => {
+  describe("GET /api/articles", () => {
+    test("Status 200: should return array of correct length and keys, sorted by ascending date", () => {
       return request(app)
         .get("/api/articles")
         .expect(200)
         .then(({ body: { articles } }) => {
           expect(articles.length).toEqual(12);
           expect(typeof articles[0]).toEqual("object");
+          expect(articles).toBeSortedBy("created_at", {
+            descending: true,
+          });
           expect(Array.isArray(articles)).toEqual(true);
-        });
-    });
-    test("Each object in the array should have the keys of slug and description. Ttheir values should be strings", () => {
-      return request(app)
-        .get("/api/articles")
-        .expect(200)
-        .then(({ body: { articles } }) => {
           articles.forEach((article) => {
             expect(article).toEqual(
               expect.objectContaining({
@@ -250,43 +247,15 @@ describe("App", () => {
         .get("/api/articles")
         .expect(200)
         .then(({ body: { articles } }) => {
-          const topicsData = [
-            {
-              description: "The man, the Mitch, the legend",
-              slug: "mitch",
-            },
-            {
-              description: "Not dogs",
-              slug: "cats",
-            },
-            {
-              description: "what books are made of",
-              slug: "paper",
-            },
-          ];
-          expect(articles).toEqual(topicsData);
+          expect(articles).toContainEqual({
+            author: "butter_bridge",
+            title: "Moustache",
+            article_id: 12,
+            topic: "mitch",
+            created_at: "2020-10-11T12:24:00.000Z",
+            votes: 0,
+          });
         });
-    });
-  });
-  describe("GET /api/articlesfd", () => {
-    test("status 200: responds with an array of article objects, which can be sorted by column but defaults to date", async () => {
-      const res = await request(app).get("/api/articles").expect(200);
-      console.log(res.body.articles);
-      expect(res.body.articles).toBeSorted();
-      expect(Array.isArray(res.body.articles)).toBe(true);
-      res.body.articles.forEach((articles) => {
-        expect(articles).toEqual(
-          expect.objectContaining({
-            article_id: expect.any(Number),
-            title: expect.any(String),
-            topic: expect.any(String),
-            author: expect.any(String),
-            created_at: expect.any(String),
-            votes: expect.any(Number),
-            comment_count: expect.any(Number),
-          })
-        );
-      });
     });
   });
 });

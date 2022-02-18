@@ -13,15 +13,18 @@ exports.getArticleByIDModel = (id) => {
   return db
     .query(`SELECT *  from articles WHERE article_id = $1;`, [id])
     .then((result) => {
-      console.log(result.rows, "RESULT HERE");
       return result.rows;
     });
 };
 
 exports.getArticlesModel = () => {
-  return db.query(`SELECT * from articles;`).then((result) => {
-    return result.rows;
-  });
+  return db
+    .query(
+      `SELECT author, title, article_id, topic, created_at, votes from articles ORDER BY created_at DESC;`
+    )
+    .then((result) => {
+      return result.rows;
+    });
 };
 
 exports.updateArticleByIdModel = (article_id, newVote) => {
