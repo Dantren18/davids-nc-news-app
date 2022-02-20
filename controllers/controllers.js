@@ -4,9 +4,14 @@ const {
 
   updateArticleByIdModel,
   getUsersModel,
+  getArticlesModel,
 } = require("../models/models.js");
 
+
+//// TOPICS CONTROLLERS
+
 const db = require("../db/connection");
+
 
 exports.getTopicsController = (req, res, next) => {
   getTopicsModel()
@@ -15,6 +20,8 @@ exports.getTopicsController = (req, res, next) => {
     })
     .catch((err) => next(err));
 };
+
+///ARTICLES CONTROLLERS
 
 exports.getArticleByIDController = (req, res, next) => {
   let id = req.params.article_id;
@@ -25,6 +32,14 @@ exports.getArticleByIDController = (req, res, next) => {
     .catch((err) => {
       next(err);
     });
+};
+
+exports.getArticlesController = (req, res, next) => {
+  getArticlesModel()
+    .then((articles) => {
+      res.status(200).send({ articles });
+    })
+    .catch((err) => next(err));
 };
 
 exports.patchArticleByIdController = (req, res, next) => {
@@ -38,6 +53,8 @@ exports.patchArticleByIdController = (req, res, next) => {
       next(err);
     });
 };
+
+// USERS CONTROLLERS
 
 exports.getUsersController = (req, res, next) => {
   getUsersModel()

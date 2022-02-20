@@ -16,6 +16,8 @@ app.get("/api/topics", getTopicsController);
 
 ///API/ARTICLES
 app.get("/api/articles/:article_id", getArticleByIDController);
+app.get("/api/articles", getArticlesController);
+
 
 app.patch("/api/articles/:article_id", patchArticleByIdController);
 
@@ -32,6 +34,7 @@ app.all("/*", (req, res) => {
 app.use((err, req, res, next) => {
   if (err.status) {
     res.status(err.status).send({ msg: err.msg });
+
   } else {
     next(err);
   }
@@ -39,7 +42,6 @@ app.use((err, req, res, next) => {
 
 app.use((err, req, res, next) => {
   res.status(500).send({ msg: "Something Internal Went Wrong" });
-
 });
 
 module.exports = app;
