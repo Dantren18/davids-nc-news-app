@@ -52,7 +52,6 @@ exports.updateArticleByIdModel = (article_id, newVote) => {
     !newVote.hasOwnProperty("inc_votes") ||
     Number.isNaN(newVote.inc_votes)
   ) {
-    console.log(newVote, "new vote");
     return Promise.reject({ status: 422, msg: "Unprocessable Entity" });
   }
 
