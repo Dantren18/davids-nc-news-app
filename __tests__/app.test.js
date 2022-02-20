@@ -76,18 +76,18 @@ describe("App", () => {
         return request(app)
           .get("/api/articles/sausages")
           .expect(400)
-          .then(({ body }) => {
-            expect(body).toEqual({ msg: "Invalid ID" });
+          .then((res) => {
+            expect(res.body.msg).toEqual("Invalid ID");
           });
       });
     });
-    describe("Status 400: bad request", () => {
+    describe("Status 404: Not Found", () => {
       test("Should recieve a status 404 error message when inputting an valid article id that doesn't exist", () => {
         return request(app)
           .get("/api/articles/999999")
           .expect(404)
-          .then(({ body }) => {
-            expect(body).toEqual({ msg: "ID Doesn't Exist" });
+          .then((res) => {
+            expect(res.body.msg).toEqual("ID Doesn't Exist");
           });
       });
     });
@@ -96,10 +96,9 @@ describe("App", () => {
         return request(app)
           .get("/api/articles/1")
           .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles.length).toEqual(1);
-            expect(Object.keys(articles[0]).length).toEqual(7);
-            expect(typeof articles[0]).toEqual("object");
+          .then(({ body }) => {
+            expect(Object.keys(body).length).toEqual(7);
+            expect(typeof body).toEqual("object");
           });
       });
     });
@@ -108,8 +107,8 @@ describe("App", () => {
         return request(app)
           .get("/api/articles/1")
           .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles[0]).toEqual({
+          .then(({ body }) => {
+            expect(body).toEqual({
               article_id: 1,
               author: "butter_bridge",
               body: "I find this existence challenging",
@@ -118,17 +117,14 @@ describe("App", () => {
               topic: "mitch",
               votes: 100,
             });
-            expect(articles.length).toEqual(1);
-            expect(Object.keys(articles[0]).length).toEqual(7);
-            expect(typeof articles[0]).toEqual("object");
           });
       });
       test("Correct data should be returned for ID 3", () => {
         return request(app)
           .get("/api/articles/3")
           .expect(200)
-          .then(({ body: { articles } }) => {
-            expect(articles[0]).toEqual({
+          .then(({ body }) => {
+            expect(body).toEqual({
               article_id: 3,
               author: "icellusedkars",
               body: "some gifs",
@@ -149,7 +145,7 @@ describe("App", () => {
         .send(incVotes)
         .expect(200)
         .then((res) => {
-          expect(res.body.article).toEqual({
+          expect(res.body).toEqual({
             article_id: 3,
             title: "Eight pug gifs that remind me of mitch",
             body: "some gifs",
@@ -161,15 +157,14 @@ describe("App", () => {
         });
     });
     test("Status 200: Should decrease vote count by 1 returning update article and 200 status code", () => {
-      // Arrange
+
       const incVotes = { inc_votes: -1 };
-      // Act
       return request(app)
         .patch("/api/articles/3")
         .send(incVotes)
         .expect(200)
         .then((res) => {
-          expect(res.body.article).toEqual({
+          expect(res.body).toEqual({
             article_id: 3,
             title: "Eight pug gifs that remind me of mitch",
             body: "some gifs",
@@ -180,41 +175,58 @@ describe("App", () => {
           });
         });
     });
-    test("Status 422 - inc_vote property not included in request body", () => {
+
+    test("Status 400 - inc_vote value is not a number in request body", () => {
       return request(app)
         .patch("/api/articles/1")
         .send({ inc_votes: "dog" })
-        .expect(422)
+        .expect(400)
         .then((res) => {
+
           expect(res.body.msg).toBe("Unprocessable Entity");
         });
     });
     test("Status 422 - inc_vote value is not a number in request body", () => {
+
+          expect(res.body.msg).toBe("Bad Request");
+        });
+    });
+    test("Status 400 - inc_vote value is not included in request body", () => {
+
       return request(app)
         .patch("/api/articles/2")
-        .expect(422)
+        .send({ inc_votes: "" })
+        .expect(400)
         .then((res) => {
+
           console.log(res.body, "in test");
           expect(res.body.msg).toBe("Unprocessable Entity");
         });
     });
     test("Status 200 - request body includes other unrelated property", () => {
+
+          expect(res.body.msg).toBe("Bad Request");
+        });
+    });
+    test("Status 400 - request body includes other unrelated property", () => {
       return request(app)
         .patch("/api/articles/5")
         .send({ inc_votes: 0, favouritePet: "dogs" })
-        .expect(200)
+        .expect(400)
         .then((res) => {
-          expect(res.body.article).toEqual({
-            article_id: 5,
-            title: "UNCOVERED: catspiracy to bring down democracy",
-            body: "Bastet walks amongst us, and the cats are taking arms!",
-            votes: 0,
-            topic: "cats",
-            author: "rogersop",
-            created_at: "2020-08-03T14:14:00.000Z",
-          });
+          expect(res.body.msg).toEqual("Bad Request");
         });
     });
+    test("Status 422 - key is wrong name / spelled incorrectly", () => {
+      return request(app)
+        .patch("/api/articles/5")
+        .send({ inc_votessssss: 1 })
+        .expect(422)
+        .then((res) => {
+          expect(res.body.msg).toEqual("Unprocessable Entity");
+        });
+    });
+
     test.only("Status 404 - patch to an valid article id, but the article doesnt exist", () => {
       return request(app)
         .patch("/api/articles/5000000")
@@ -222,6 +234,19 @@ describe("App", () => {
         .expect(404)
         .then((res) => {
           expect(res.body.msg).toEqual("Not Found");
+
+  });
+
+  describe("GET /api/users", () => {
+    test("Status 200: response to be an array of objects of length 3", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({ body: { users } }) => {
+          expect(users.length).toEqual(4);
+          expect(typeof users[0]).toEqual("object");
+          expect(Array.isArray(users)).toEqual(true);
+
         });
     });
     test("Status 400 - request api is invalid", () => {
@@ -260,6 +285,37 @@ describe("App", () => {
             );
           });
         });
+    });
+    describe("Status 400: bad request", () => {
+      test("Should recieve a status 404 error message when inputting an valid article id that doesn't exist", () => {
+        return request(app)
+          .get("/api/articles/999999")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body).toEqual({ msg: "ID Doesn't Exist" });
+          });
+      });
+    });
+  });
+  describe("PATCH /api/articles/:article_id", () => {
+    describe("Properties of response should be correct", () => {
+      test("Returned item should be a single article with correct properties", () => {
+        return request(app)
+          .patch("/api/articles/1")
+          .send({ inc_votes: 1 })
+          .expect(200)
+          .then((articles) => {
+            expect(articles.body).toEqual({
+              article_id: 1,
+              author: "butter_bridge",
+              body: "I find this existence challenging",
+              created_at: "2020-07-09T21:11:00.000Z",
+              title: "Living in the shadow of a great man",
+              topic: "mitch",
+              votes: 101,
+            });
+          });
+      });
     });
     test("Should return correct data", () => {
       return request(app)
