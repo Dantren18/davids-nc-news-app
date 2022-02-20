@@ -85,6 +85,31 @@ exports.updateArticleByIdModel = (article_id, newVote) => {
     .then(({ rows }) => rows);
 };
 
+exports.getCommentsModel = async (article_id) => {
+  if (
+    !article_id ||
+    Number.isNaN(Number.parseInt(article_id)) ||
+    Number.parseInt(article_id) <= 0
+  ) {
+    return Promise.reject({ status: 400, msg: "Bad Request" });
+  }
+  const maxId = await db.query(
+    `SELECT articles.article_id FROM articles
+        ORDER BY articles.article_id desc
+        LIMIT 1;`
+  );
+  if (article_id > maxId.rows[0].article_id) {
+    return Promise.reject({ status: 404, msg: "Not Found!" });
+  }
+  const comments = await db.query(
+    `SELECT comments.comment_id, comments.votes, comments.created_at,
+         comments.author, comments.body FROM comments
+         WHERE article_id = $1;`,
+    [article_id]
+  );
+  return comments.rows;
+};
+
 //USERS MODELS
 exports.getUsersModel = () => {
   return db.query(`SELECT username from users;`).then((result) => {

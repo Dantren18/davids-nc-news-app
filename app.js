@@ -2,7 +2,7 @@ const express = require("express");
 const {
   getTopicsController,
   getArticleByIDController,
-
+  getCommentsController,
   patchArticleByIdController,
   getUsersController,
   getArticlesController,
@@ -16,8 +16,8 @@ app.get("/api/topics", getTopicsController);
 
 ///API/ARTICLES
 app.get("/api/articles/:article_id", getArticleByIDController);
+app.get("/api/articles/:article_id/comments", getCommentsController);
 app.get("/api/articles", getArticlesController);
-
 
 app.patch("/api/articles/:article_id", patchArticleByIdController);
 
@@ -26,7 +26,6 @@ app.get("/api/users", getUsersController);
 
 ///ERRORS
 
-
 app.all("/*", (req, res) => {
   res.status(404).send({ msg: "Route not found" });
 });
@@ -34,7 +33,6 @@ app.all("/*", (req, res) => {
 app.use((err, req, res, next) => {
   if (err.status) {
     res.status(err.status).send({ msg: err.msg });
-
   } else {
     next(err);
   }

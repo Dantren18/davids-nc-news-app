@@ -1,17 +1,15 @@
 const {
   getTopicsModel,
   getArticleByIDModel,
-
+  getCommentsModel,
   updateArticleByIdModel,
   getUsersModel,
   getArticlesModel,
 } = require("../models/models.js");
 
-
 //// TOPICS CONTROLLERS
 
 const db = require("../db/connection");
-
 
 exports.getTopicsController = (req, res, next) => {
   getTopicsModel()
@@ -53,6 +51,36 @@ exports.patchArticleByIdController = (req, res, next) => {
       next(err);
     });
 };
+
+exports.getCommentsController = (req, res, next) => {
+  const id = req.params.article_id;
+  getCommentsModel(id)
+    .then((comments) => {
+      res.status(200).send({ comments });
+    })
+    .catch((err) => next(err));
+};
+
+// exports.getCommentsController = (req, res, next) => {
+//   console.log(req.params, "req in controller");
+//   console.log(req.query);
+//   getCommentsModel(req.params, req.query)
+//     .then((comments) => {
+//       if (comments.length === 0) {
+//         return Promise.all([comments, checkArticleExist(req.params)]);
+//       } else {
+//         return [comments, true];
+//       }
+//     })
+//     .then(([comments, articleExists]) => {
+//       if (!articleExists) {
+//         return Promise.reject({ status: 404, msg: "Comments not found" });
+//       } else {
+//         res.status(200).send({ comments });
+//       }
+//     })
+//     .catch(next);
+// };
 
 // USERS CONTROLLERS
 
