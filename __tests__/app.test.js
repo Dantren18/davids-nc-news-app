@@ -119,6 +119,23 @@ describe("App", () => {
             });
           });
       });
+      test("Article with 0 comments correctly returns", () => {
+        return request(app)
+          .get("/api/articles/4")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body).toEqual({
+              article_id: 4,
+              author: "rogersop",
+              body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
+              comment_count: "0",
+              created_at: "2020-05-06T02:14:00.000Z",
+              title: "Student SUES Mitch!",
+              topic: "mitch",
+              votes: 0,
+            });
+          });
+      });
       test("Correct data should be returned for ID 3", () => {
         return request(app)
           .get("/api/articles/3")
