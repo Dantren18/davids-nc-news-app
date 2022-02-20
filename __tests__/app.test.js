@@ -3,6 +3,7 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const data = require("../db/data/test-data/index");
 const request = require("supertest");
+const jestSorted = require("jest-sorted");
 
 afterAll(() => db.end());
 
@@ -156,6 +157,7 @@ describe("App", () => {
         });
     });
     test("Status 200: Should decrease vote count by 1 returning update article and 200 status code", () => {
+
       const incVotes = { inc_votes: -1 };
       return request(app)
         .patch("/api/articles/3")
@@ -173,21 +175,36 @@ describe("App", () => {
           });
         });
     });
+
     test("Status 400 - inc_vote value is not a number in request body", () => {
       return request(app)
         .patch("/api/articles/1")
         .send({ inc_votes: "dog" })
         .expect(400)
         .then((res) => {
+
+          expect(res.body.msg).toBe("Unprocessable Entity");
+        });
+    });
+    test("Status 422 - inc_vote value is not a number in request body", () => {
+
           expect(res.body.msg).toBe("Bad Request");
         });
     });
     test("Status 400 - inc_vote value is not included in request body", () => {
+
       return request(app)
         .patch("/api/articles/2")
         .send({ inc_votes: "" })
         .expect(400)
         .then((res) => {
+
+          console.log(res.body, "in test");
+          expect(res.body.msg).toBe("Unprocessable Entity");
+        });
+    });
+    test("Status 200 - request body includes other unrelated property", () => {
+
           expect(res.body.msg).toBe("Bad Request");
         });
     });
@@ -209,6 +226,15 @@ describe("App", () => {
           expect(res.body.msg).toEqual("Unprocessable Entity");
         });
     });
+
+    test.only("Status 404 - patch to an valid article id, but the article doesnt exist", () => {
+      return request(app)
+        .patch("/api/articles/5000000")
+        .send({ inc_votes: 0 })
+        .expect(404)
+        .then((res) => {
+          expect(res.body.msg).toEqual("Not Found");
+
   });
 
   describe("GET /api/users", () => {
@@ -220,17 +246,41 @@ describe("App", () => {
           expect(users.length).toEqual(4);
           expect(typeof users[0]).toEqual("object");
           expect(Array.isArray(users)).toEqual(true);
+
         });
     });
-    test("Each object in the array should have the keys of slug and description. Ttheir values should be strings", () => {
+    test("Status 400 - request api is invalid", () => {
       return request(app)
-        .get("/api/users")
+        .patch("/api/articles/sausages")
+        .send({ inc_votes: 0, favouritePet: "dogs" })
+        .expect(400)
+        .then((res) => {
+          console.log(res.body, "in test");
+          expect(res.body.msg).toEqual("Bad Request");
+        });
+    });
+  });
+  describe("GET /api/articles", () => {
+    test("Status 200: should return array of correct length and keys, sorted by ascending date", () => {
+      return request(app)
+        .get("/api/articles")
         .expect(200)
-        .then(({ body: { users } }) => {
-          users.forEach((user) => {
-            expect(user).toEqual(
+        .then(({ body: { articles } }) => {
+          expect(articles.length).toEqual(12);
+          expect(typeof articles[0]).toEqual("object");
+          expect(articles).toBeSortedBy("created_at", {
+            descending: true,
+          });
+          expect(Array.isArray(articles)).toEqual(true);
+          articles.forEach((article) => {
+            expect(article).toEqual(
               expect.objectContaining({
-                username: expect.any(String),
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
               })
             );
           });
@@ -269,16 +319,17 @@ describe("App", () => {
     });
     test("Should return correct data", () => {
       return request(app)
-        .get("/api/users")
+        .get("/api/articles")
         .expect(200)
-        .then(({ body: { users } }) => {
-          const usersData = [
-            { username: "butter_bridge" },
-            { username: "icellusedkars" },
-            { username: "rogersop" },
-            { username: "lurker" },
-          ];
-          expect(users).toEqual(usersData);
+        .then(({ body: { articles } }) => {
+          expect(articles).toContainEqual({
+            author: "butter_bridge",
+            title: "Moustache",
+            article_id: 12,
+            topic: "mitch",
+            created_at: "2020-10-11T12:24:00.000Z",
+            votes: 0,
+          });
         });
     });
   });
