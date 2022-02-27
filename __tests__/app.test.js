@@ -250,21 +250,6 @@ describe("App", () => {
           });
         });
     });
-    test("Status 200: Should return correct data", () => {
-      return request(app)
-        .get("/api/articles")
-        .expect(200)
-        .then(({ body: { articles } }) => {
-          expect(articles).toContainEqual({
-            author: "butter_bridge",
-            title: "Moustache",
-            article_id: 12,
-            topic: "mitch",
-            created_at: "2020-10-11T12:24:00.000Z",
-            votes: 0,
-          });
-        });
-    });
   });
   describe("GET /api/users", () => {
     test("Status 200: response to be an array of objects of length 3", () => {
@@ -302,15 +287,68 @@ describe("App", () => {
           articles.forEach((article) => {
             expect(article).toEqual(
               expect.objectContaining({
-                author: expect.any(String),
-                title: expect.any(String),
                 article_id: expect.any(Number),
+                title: expect.any(String),
                 topic: expect.any(String),
+                author: expect.any(String),
+                body: expect.any(String),
                 created_at: expect.any(String),
                 votes: expect.any(Number),
+                comment_count: expect.any(String),
               })
             );
           });
+        });
+    });
+    test("Status: 200 sorts by sort_by", () => {
+      return request(app)
+        .get("/api/articles?sort_by=title&order=asc&topic=cats")
+        .expect(200)
+        .then(({ body }) => {
+          body.articles.forEach((article) => {
+            expect(article).toMatchObject({
+              article_id: expect.any(Number),
+              title: expect.any(String),
+              topic: "cats",
+              author: expect.any(String),
+              body: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              comment_count: expect.any(String),
+            });
+          });
+          expect([{ body }]).toBeSortedBy("title", {
+            ascending: true,
+          });
+        });
+    });
+    test("Status: 400 invalid order", () => {
+      return request(app)
+        .get("/api/articles?sort_by=title&order=XXXXXX")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe(
+            "Invalid order query - choose between asc and desc"
+          );
+        });
+    });
+
+    test("Status: 400 invalid sort", () => {
+      return request(app)
+        .get("/api/articles?sort_by=XXXXXX")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe(
+            "Invalid sort query - you can sort by title, topic, author, created_at, votes, or article_id"
+          );
+        });
+    });
+    test("Status: 400 invalid topic", () => {
+      return request(app)
+        .get("/api/articles?sort_by=title&topic=XXXXXX")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("No topic found");
         });
     });
     test("Status 404: When inputting an valid article id that doesn't exist, should receive 404", () => {

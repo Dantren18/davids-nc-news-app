@@ -35,7 +35,8 @@ exports.getArticleByIDController = (req, res, next) => {
 };
 
 exports.getArticlesController = (req, res, next) => {
-  getArticlesModel()
+  const { sort_by, order, topic } = req.query;
+  getArticlesModel(sort_by, order, topic)
     .then((articles) => {
       res.status(200).send({ articles });
     })

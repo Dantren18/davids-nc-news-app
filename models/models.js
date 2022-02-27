@@ -31,16 +31,54 @@ exports.getArticleByIDModel = (id) => {
     });
 };
 
-exports.getArticlesModel = () => {
-  return db
-    .query(
-      `SELECT author, title, article_id, topic, created_at, votes from articles ORDER BY created_at DESC;`
+// exports.getArticlesModel = () => {
+//   return db
+//     .query(
+//       `SELECT author, title, article_id, topic, created_at, votes from articles ORDER BY created_at DESC;`
+//     )
+//     .then((result) => {
+//       if (result.rows.length != 0) {
+//         return result.rows;
+//       } else return Promise.reject({ status: 404, msg: "ID Doesn't Exist" });
+//     });
+// };
+
+exports.getArticlesModel = (sort_by = "created_at", order = "desc", topic) => {
+  if (
+    !["title", "topic", "author", "created_at", "votes", "article_id"].includes(
+      sort_by
     )
-    .then((result) => {
-      if (result.rows.length != 0) {
-        return result.rows;
-      } else return Promise.reject({ status: 404, msg: "ID Doesn't Exist" });
+  ) {
+    return Promise.reject({
+      status: 400,
+      msg: "Invalid sort query - you can sort by title, topic, author, created_at, votes, or article_id",
     });
+  }
+  if (!["asc", "desc"].includes(order)) {
+    return Promise.reject({
+      status: 400,
+      msg: "Invalid order query - choose between asc and desc",
+    });
+  }
+  const queryValues = [];
+  let queryStr = `
+  SELECT articles.*,
+  COUNT(comments.article_id) AS comment_count FROM articles 
+  LEFT JOIN comments ON articles.article_id = comments.article_id`;
+
+  if (topic) {
+    queryValues.push(topic);
+    queryStr += ` WHERE topic = $1`;
+  }
+  order = order.toUpperCase();
+  queryStr += ` GROUP BY articles.article_id
+  ORDER BY ${sort_by} ${order};`;
+  return db.query(queryStr, queryValues).then(({ rows }) => {
+    if (rows.length === 0) {
+      return Promise.reject({ status: 400, msg: "No topic found" });
+    }
+    return rows;
+  });
 };
 
 exports.updateArticleByIdModel = (article_id, newVote) => {
