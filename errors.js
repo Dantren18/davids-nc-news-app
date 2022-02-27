@@ -1,51 +1,25 @@
-// exports.checkArticleID = (articleID) => {
-//   if (!Number.isInteger(parseInt(articleID))) {
-//     return Promise.reject({
-//       status: 400,
-//       msg: "Invalid article ID",
-//     });
-//   }
-//   return db
-//     .query(`SELECT * FROM articles WHERE articles.article_id = $1;`, [
-//       articleID,
-//     ])
-//     .then((result) => {
-//       if (result.rows.length === 0) {
-//         return Promise.reject({
-//           status: 404,
-//           msg: "Article ID does not exist",
-//         });
-//       }
-//       return articleID;
-//     });
-// };
+exports.handleCustomError = (err, req, res, next) => {
+  if (err.status) {
+    res.status(err.status).send({ msg: err.msg });
+  } else {
+    next(err);
+  }
+};
 
-// exports.checkRequestBody = (requestBody) => {
-//   if (!requestBody || requestBody === {}) {
-//     return Promise.reject({
-//       status: 400,
-//       msg: "Request body is empty",
-//     });
-//   }
-//   return requestBody;
-// };
+exports.handle400Error = (err, req, res, next) => {
+  if (err.code === "22P02") {
+    res.status(400).send({ msg: "Invalid ID type" });
+  } else if (err.code === "23502" || err.code === "22001") {
+    res.status(400).send({ msg: "Invalid input" });
+  } else next(err);
+};
 
-// exports.checkVotes = (votes) => {
-//   if (!votes.inc_votes) {
-//     return Promise.reject({
-//       status: 400,
-//       msg: "The request body must be structured as follows: { inc_votes: number_of_votes }",
-//     });
-//   } else if (!Number.isInteger(votes.inc_votes)) {
-//     return Promise.reject({
-//       status: 422,
-//       msg: "Votes must be an integer!",
-//     });
-//   } else if (Object.keys(votes).length > 1) {
-//     return Promise.reject({
-//       status: 422,
-//       msg: "The request body must be structured as follows: { inc_votes: number_of_votes }",
-//     });
-//   }
-//   return votes;
-// };
+exports.handle404Error = (err, req, res, next) => {
+  if (err.code === "23503") {
+    res.status(404).send({ msg: "Requested ID not found" });
+  } else next(err);
+};
+
+exports.handleServerError = (err, req, res, next) => {
+  res.status(500).send({ msg: "Internal server error" });
+};

@@ -233,6 +233,38 @@ describe("App", () => {
           expect(res.body.msg).toEqual("Not Found");
         });
     });
+    test("Status 200: Returned item should be a single article with correct properties", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: 1 })
+        .expect(200)
+        .then((articles) => {
+          expect(articles.body).toEqual({
+            article_id: 1,
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: "2020-07-09T21:11:00.000Z",
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            votes: 101,
+          });
+        });
+    });
+    test("Status 200: Should return correct data", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).toContainEqual({
+            author: "butter_bridge",
+            title: "Moustache",
+            article_id: 12,
+            topic: "mitch",
+            created_at: "2020-10-11T12:24:00.000Z",
+            votes: 0,
+          });
+        });
+    });
   });
   describe("GET /api/users", () => {
     test("Status 200: response to be an array of objects of length 3", () => {
@@ -281,48 +313,12 @@ describe("App", () => {
           });
         });
     });
-    test("Should recieve a status 404 error message when inputting an valid article id that doesn't exist", () => {
+    test("Status 404: When inputting an valid article id that doesn't exist, should receive 404", () => {
       return request(app)
         .get("/api/articles/999999")
         .expect(404)
         .then(({ body }) => {
           expect(body).toEqual({ msg: "ID Doesn't Exist" });
-        });
-    });
-  });
-  describe("PATCH /api/articles/:article_id", () => {
-    describe("Properties of response should be correct", () => {
-      test("Returned item should be a single article with correct properties", () => {
-        return request(app)
-          .patch("/api/articles/1")
-          .send({ inc_votes: 1 })
-          .expect(200)
-          .then((articles) => {
-            expect(articles.body).toEqual({
-              article_id: 1,
-              author: "butter_bridge",
-              body: "I find this existence challenging",
-              created_at: "2020-07-09T21:11:00.000Z",
-              title: "Living in the shadow of a great man",
-              topic: "mitch",
-              votes: 101,
-            });
-          });
-      });
-    });
-    test("Should return correct data", () => {
-      return request(app)
-        .get("/api/articles")
-        .expect(200)
-        .then(({ body: { articles } }) => {
-          expect(articles).toContainEqual({
-            author: "butter_bridge",
-            title: "Moustache",
-            article_id: 12,
-            topic: "mitch",
-            created_at: "2020-10-11T12:24:00.000Z",
-            votes: 0,
-          });
         });
     });
   });
@@ -347,7 +343,7 @@ describe("App", () => {
           });
         });
     });
-    test("Error 400: responds with an error 400 when passed invalid ID", () => {
+    test("Status 400: responds with an error 400 when passed invalid ID", () => {
       return request(app)
         .get("/api/articles/notAnID/comments")
         .expect(400)
@@ -355,7 +351,7 @@ describe("App", () => {
           expect(body.msg).toBe("Bad Request");
         });
     });
-    test("Error 404: responds with an error 404 when passed id does not exist", () => {
+    test("Status 404: responds with an error 404 when passed id does not exist", () => {
       return request(app)
         .get("/api/articles/20/comments")
         .expect(404)
@@ -363,7 +359,7 @@ describe("App", () => {
           expect(body.msg).toBe("Not Found!");
         });
     });
-    test("GET 200: valid id but has no comments, respons with an empty array", () => {
+    test("Status 200: valid id but has no comments, respons with an empty array", () => {
       return request(app)
         .get("/api/articles/2/comments")
         .expect(200)
@@ -373,6 +369,108 @@ describe("App", () => {
           expect(comments.length).toBe(0);
           expect(comments).toEqual([]);
         });
+    });
+  });
+  describe("POST /api/articles/:article_id/comments", () => {
+    test("status 201: responds with the posted comment object", () => {
+      const commentTest = { username: "icellusedkars", body: "test comment" };
+      const article_id = 1;
+      return request(app)
+        .post(`/api/articles/${article_id}/comments`)
+        .send(commentTest)
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.insertComment[0]).toMatchObject({
+            body: expect.any(String),
+            votes: expect.any(Number),
+            author: expect.any(String),
+            article_id: expect.any(Number),
+            created_at: expect.any(String),
+          });
+        });
+    });
+
+    test("status 404: responds with an error message if article id is valid but not in the database", () => {
+      const commentTest = { username: "icellusedkars", body: "test comment" };
+      const article_id = 999;
+      return request(app)
+        .post(`/api/articles/${article_id}/comments`)
+        .send(commentTest)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Requested ID not found");
+        });
+    });
+    test("status 400: responds with an error message if article id is an invalid data type", () => {
+      const commentTest = { username: "icellusedkars", body: "test comment" };
+      const article_id = "notanid";
+      return request(app)
+        .post(`/api/articles/${article_id}/comments`)
+        .send(commentTest)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid ID type");
+        });
+    });
+    test("status 400: responds with an error message if new comment does not have body or username properties", () => {
+      const commentTest = {
+        userGnome: "icellusedkars",
+        body: "test comment",
+      };
+      const article_id = 1;
+      return request(app)
+        .post(`/api/articles/${article_id}/comments`)
+        .send(commentTest)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid input");
+        });
+    });
+    test("status 404: responds with an error message if new comment username does not currently exist", () => {
+      const commentTest = {
+        username: "test_user",
+        body: "3",
+      };
+      const article_id = 1;
+      return request(app)
+        .post(`/api/articles/${article_id}/comments`)
+        .send(commentTest)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("User does not exist");
+        });
+    });
+  });
+  describe("DELETE /api/comments/:comment_id", () => {
+    test("Status 204: no response body, successfully deletes requested comment", () => {
+      const commentToDelete = 1;
+      return request(app)
+        .delete(`/api/comments/${commentToDelete}`)
+        .expect(204);
+    });
+    test("Status 404: responds with an error message if comment id is valid but not currently in the database", () => {
+      const commentToDelete = 9999;
+      return request(app)
+        .delete(`/api/comments/${commentToDelete}`)
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("No comment found to delete");
+        });
+    });
+    test("Status 400: responds with an error message if comment id is an invalid data type", () => {
+      const commentToDelete = "DELETE_ME";
+      return request(app)
+        .delete(`/api/comments/${commentToDelete}`)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid ID type");
+        });
+    });
+  });
+  describe("GET /api", () => {
+    test("Status 200: responds with a JSON object describing endpoints in the api", () => {
+      return request(app).get(`/api`).expect(200);
+      //unsure what I should be testing for on this one
     });
   });
 });

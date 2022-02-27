@@ -85,6 +85,15 @@ exports.updateArticleByIdModel = (article_id, newVote) => {
     .then(({ rows }) => rows);
 };
 
+//USERS MODELS
+exports.getUsersModel = () => {
+  return db.query(`SELECT username from users;`).then((result) => {
+    return result.rows;
+  });
+};
+
+// COMMENTS MODELS
+
 exports.getCommentsModel = async (article_id) => {
   if (
     !article_id ||
@@ -110,9 +119,55 @@ exports.getCommentsModel = async (article_id) => {
   return comments.rows;
 };
 
-//USERS MODELS
-exports.getUsersModel = () => {
-  return db.query(`SELECT username from users;`).then((result) => {
-    return result.rows;
-  });
+exports.postCommentsModel = (articleid, comment) => {
+  const { username, body } = comment;
+
+  if (!username || !body) {
+    return Promise.reject({ status: 400, msg: "Invalid input" });
+  }
+  if (
+    ![
+      "tickle122",
+      "grumpy19",
+      "happyamy2016",
+      "cooljmessy",
+      "weegembump",
+      "jessjelly",
+      "butter_bridge",
+      "icellusedkars",
+      "rogersop",
+      "lurker",
+    ].includes(username)
+  ) {
+    return Promise.reject({ status: 404, msg: "User does not exist" });
+  }
+  return db
+    .query(
+      `INSERT INTO comments (author, article_id, body)
+			VALUES ($1, $2, $3)
+			RETURNING *;`,
+      [username, articleid, body]
+    )
+    .then(({ rows }) => {
+      return rows;
+    });
+};
+
+exports.deleteCommentsModel = (commentId) => {
+  return db
+    .query(
+      `
+			DELETE FROM comments
+			WHERE comment_id = $1;`,
+      [commentId]
+    )
+    .then((deleteConf) => {
+      const { rowCount } = deleteConf;
+      if (rowCount === 0) {
+        return Promise.reject({
+          status: 404,
+          msg: "No comment found to delete",
+        });
+      } else return;
+    });
 };
