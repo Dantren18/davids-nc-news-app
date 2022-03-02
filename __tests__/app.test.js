@@ -38,6 +38,7 @@ describe("App", () => {
         .expect(200)
         .then(({ body: { topics } }) => {
           topics.forEach((topic) => {
+            expect(Object.keys(topic).length).toEqual(2);
             expect(topic).toEqual(
               expect.objectContaining({
                 description: expect.any(String),
@@ -79,7 +80,6 @@ describe("App", () => {
           expect(res.body.msg).toEqual("Invalid ID");
         });
     });
-
     test("Status 404: Should recieve a status 404 error message when inputting an valid article id that doesn't exist", () => {
       return request(app)
         .get("/api/articles/999999")
@@ -88,7 +88,6 @@ describe("App", () => {
           expect(res.body.msg).toEqual("ID Doesn't Exist");
         });
     });
-
     test("Status 200: Item should be object of length 7 in an array", () => {
       return request(app)
         .get("/api/articles/1")
@@ -98,7 +97,6 @@ describe("App", () => {
           expect(typeof body).toEqual("object");
         });
     });
-
     test("Status 200: Correct data should be returned for ID 1", () => {
       return request(app)
         .get("/api/articles/1")
@@ -158,16 +156,18 @@ describe("App", () => {
         .patch("/api/articles/3")
         .send(incVotes)
         .expect(200)
-        .then((res) => {
-          expect(res.body).toEqual({
-            article_id: 3,
-            title: "Eight pug gifs that remind me of mitch",
-            body: "some gifs",
-            votes: 1,
-            topic: "mitch",
-            author: "icellusedkars",
-            created_at: "2020-11-03T09:12:00.000Z",
-          });
+        .then(({ body }) => {
+          expect(body.article).toEqual([
+            {
+              article_id: 3,
+              title: "Eight pug gifs that remind me of mitch",
+              body: "some gifs",
+              votes: 1,
+              topic: "mitch",
+              author: "icellusedkars",
+              created_at: "2020-11-03T09:12:00.000Z",
+            },
+          ]);
         });
     });
     test("Status 200: Should decrease vote count by 1 returning update article and 200 status code", () => {
@@ -176,16 +176,18 @@ describe("App", () => {
         .patch("/api/articles/3")
         .send(incVotes)
         .expect(200)
-        .then((res) => {
-          expect(res.body).toEqual({
-            article_id: 3,
-            title: "Eight pug gifs that remind me of mitch",
-            body: "some gifs",
-            votes: -1,
-            topic: "mitch",
-            author: "icellusedkars",
-            created_at: "2020-11-03T09:12:00.000Z",
-          });
+        .then(({ body }) => {
+          expect(body.article).toEqual([
+            {
+              article_id: 3,
+              title: "Eight pug gifs that remind me of mitch",
+              body: "some gifs",
+              votes: -1,
+              topic: "mitch",
+              author: "icellusedkars",
+              created_at: "2020-11-03T09:12:00.000Z",
+            },
+          ]);
         });
     });
     test("Status 400 - inc_vote value is not a number in request body", () => {
@@ -238,16 +240,18 @@ describe("App", () => {
         .patch("/api/articles/1")
         .send({ inc_votes: 1 })
         .expect(200)
-        .then((articles) => {
-          expect(articles.body).toEqual({
-            article_id: 1,
-            author: "butter_bridge",
-            body: "I find this existence challenging",
-            created_at: "2020-07-09T21:11:00.000Z",
-            title: "Living in the shadow of a great man",
-            topic: "mitch",
-            votes: 101,
-          });
+        .then(({ body }) => {
+          expect(body.article).toEqual([
+            {
+              article_id: 1,
+              author: "butter_bridge",
+              body: "I find this existence challenging",
+              created_at: "2020-07-09T21:11:00.000Z",
+              title: "Living in the shadow of a great man",
+              topic: "mitch",
+              votes: 101,
+            },
+          ]);
         });
     });
   });
@@ -285,13 +289,13 @@ describe("App", () => {
           });
           expect(Array.isArray(articles)).toEqual(true);
           articles.forEach((article) => {
+            expect(Object.keys(article).length).toEqual(7);
             expect(article).toEqual(
               expect.objectContaining({
                 article_id: expect.any(Number),
                 title: expect.any(String),
                 topic: expect.any(String),
                 author: expect.any(String),
-                body: expect.any(String),
                 created_at: expect.any(String),
                 votes: expect.any(Number),
                 comment_count: expect.any(String),
@@ -306,16 +310,18 @@ describe("App", () => {
         .expect(200)
         .then(({ body }) => {
           body.articles.forEach((article) => {
-            expect(article).toMatchObject({
-              article_id: expect.any(Number),
-              title: expect.any(String),
-              topic: "cats",
-              author: expect.any(String),
-              body: expect.any(String),
-              created_at: expect.any(String),
-              votes: expect.any(Number),
-              comment_count: expect.any(String),
-            });
+            expect(Object.keys(article).length).toEqual(7);
+            expect(article).toEqual(
+              expect.objectContaining({
+                article_id: expect.any(Number),
+                title: expect.any(String),
+                topic: "cats",
+                author: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                comment_count: expect.any(String),
+              })
+            );
           });
           expect([{ body }]).toBeSortedBy("title", {
             ascending: true,
@@ -369,6 +375,7 @@ describe("App", () => {
           expect(Array.isArray(comments)).toBe(true);
           expect(comments.length).toBe(11);
           comments.forEach((comment) => {
+            expect(Object.keys(comment).length).toEqual(5);
             expect(comment).toEqual(
               expect.objectContaining({
                 comment_id: expect.any(Number),
@@ -427,7 +434,27 @@ describe("App", () => {
           });
         });
     });
-
+    test("status 201: responds with the posted comment object even if client sends object with unecessary keys", () => {
+      const commentTest = {
+        username: "icellusedkars",
+        body: "test comment",
+        besttutor: "Kev",
+      };
+      const article_id = 1;
+      return request(app)
+        .post(`/api/articles/${article_id}/comments`)
+        .send(commentTest)
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.insertComment[0]).toMatchObject({
+            body: expect.any(String),
+            votes: expect.any(Number),
+            author: expect.any(String),
+            article_id: expect.any(Number),
+            created_at: expect.any(String),
+          });
+        });
+    });
     test("status 404: responds with an error message if article id is valid but not in the database", () => {
       const commentTest = { username: "icellusedkars", body: "test comment" };
       const article_id = 999;

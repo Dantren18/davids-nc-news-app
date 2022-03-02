@@ -47,8 +47,8 @@ exports.patchArticleByIdController = (req, res, next) => {
   const { article_id } = req.params;
   const newVote = req.body;
   updateArticleByIdModel(article_id, newVote)
-    .then((articles) => {
-      res.status(200).send(articles[0]);
+    .then((article) => {
+      res.status(200).send({ article });
     })
     .catch((err) => {
       next(err);
@@ -98,7 +98,6 @@ exports.deleteCommentsController = (req, res, next) => {
 
 //API
 exports.getApiController = (req, res, next) => {
-  console.log("Inside controller");
   res.status(200).send({
     "GET /api": {
       description:

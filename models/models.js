@@ -31,18 +31,6 @@ exports.getArticleByIDModel = (id) => {
     });
 };
 
-// exports.getArticlesModel = () => {
-//   return db
-//     .query(
-//       `SELECT author, title, article_id, topic, created_at, votes from articles ORDER BY created_at DESC;`
-//     )
-//     .then((result) => {
-//       if (result.rows.length != 0) {
-//         return result.rows;
-//       } else return Promise.reject({ status: 404, msg: "ID Doesn't Exist" });
-//     });
-// };
-
 exports.getArticlesModel = (sort_by = "created_at", order = "desc", topic) => {
   if (
     !["title", "topic", "author", "created_at", "votes", "article_id"].includes(
@@ -62,7 +50,7 @@ exports.getArticlesModel = (sort_by = "created_at", order = "desc", topic) => {
   }
   const queryValues = [];
   let queryStr = `
-  SELECT articles.*,
+  SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes,
   COUNT(comments.article_id) AS comment_count FROM articles 
   LEFT JOIN comments ON articles.article_id = comments.article_id`;
 
