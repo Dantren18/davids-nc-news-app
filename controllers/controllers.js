@@ -26,8 +26,8 @@ exports.getTopicsController = (req, res, next) => {
 exports.getArticleByIDController = (req, res, next) => {
   let id = req.params.article_id;
   getArticleByIDModel(id)
-    .then((articles) => {
-      res.status(200).send(articles[0]);
+    .then((article) => {
+      res.status(200).send({ article });
     })
     .catch((err) => {
       next(err);

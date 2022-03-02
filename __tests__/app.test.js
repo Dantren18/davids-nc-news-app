@@ -93,7 +93,7 @@ describe("App", () => {
         .get("/api/articles/1")
         .expect(200)
         .then(({ body }) => {
-          expect(Object.keys(body).length).toEqual(8);
+          expect(Object.keys(body.article[0]).length).toEqual(8);
           expect(typeof body).toEqual("object");
         });
     });
@@ -102,16 +102,18 @@ describe("App", () => {
         .get("/api/articles/1")
         .expect(200)
         .then(({ body }) => {
-          expect(body).toEqual({
-            article_id: 1,
-            author: "butter_bridge",
-            body: "I find this existence challenging",
-            comment_count: "11",
-            created_at: "2020-07-09T21:11:00.000Z",
-            title: "Living in the shadow of a great man",
-            topic: "mitch",
-            votes: 100,
-          });
+          expect(body.article).toEqual([
+            {
+              article_id: 1,
+              author: "butter_bridge",
+              body: "I find this existence challenging",
+              comment_count: "11",
+              created_at: "2020-07-09T21:11:00.000Z",
+              title: "Living in the shadow of a great man",
+              topic: "mitch",
+              votes: 100,
+            },
+          ]);
         });
     });
     test("Status 200: Article with 0 comments correctly returns", () => {
@@ -119,16 +121,18 @@ describe("App", () => {
         .get("/api/articles/4")
         .expect(200)
         .then(({ body }) => {
-          expect(body).toEqual({
-            article_id: 4,
-            author: "rogersop",
-            body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
-            comment_count: "0",
-            created_at: "2020-05-06T02:14:00.000Z",
-            title: "Student SUES Mitch!",
-            topic: "mitch",
-            votes: 0,
-          });
+          expect(body.article).toEqual([
+            {
+              article_id: 4,
+              author: "rogersop",
+              body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
+              comment_count: "0",
+              created_at: "2020-05-06T02:14:00.000Z",
+              title: "Student SUES Mitch!",
+              topic: "mitch",
+              votes: 0,
+            },
+          ]);
         });
     });
     test("Status 200: Correct data should be returned for ID 3", () => {
@@ -136,16 +140,18 @@ describe("App", () => {
         .get("/api/articles/3")
         .expect(200)
         .then(({ body }) => {
-          expect(body).toEqual({
-            article_id: 3,
-            author: "icellusedkars",
-            body: "some gifs",
-            comment_count: "2",
-            created_at: "2020-11-03T09:12:00.000Z",
-            title: "Eight pug gifs that remind me of mitch",
-            topic: "mitch",
-            votes: 0,
-          });
+          expect(body.article).toEqual([
+            {
+              article_id: 3,
+              author: "icellusedkars",
+              body: "some gifs",
+              comment_count: "2",
+              created_at: "2020-11-03T09:12:00.000Z",
+              title: "Eight pug gifs that remind me of mitch",
+              topic: "mitch",
+              votes: 0,
+            },
+          ]);
         });
     });
   });
