@@ -159,19 +159,19 @@ describe("App", () => {
     test("Status 200: Should increase vote count by 1 returning update article and 200 status code.", () => {
       const incVotes = { inc_votes: 1 };
       return request(app)
-        .patch("/api/articles/3")
+        .patch("/api/articles/1")
         .send(incVotes)
         .expect(200)
         .then(({ body }) => {
           expect(body.article).toEqual([
             {
-              article_id: 3,
-              title: "Eight pug gifs that remind me of mitch",
-              body: "some gifs",
-              votes: 1,
+              article_id: 1,
+              title: "Living in the shadow of a great man",
+              body: "I find this existence challenging",
+              votes: 101,
               topic: "mitch",
-              author: "icellusedkars",
-              created_at: "2020-11-03T09:12:00.000Z",
+              author: "butter_bridge",
+              created_at: "2020-07-09T21:11:00.000Z",
             },
           ]);
         });
@@ -344,7 +344,6 @@ describe("App", () => {
           );
         });
     });
-
     test("Status: 400 invalid sort", () => {
       return request(app)
         .get("/api/articles?sort_by=XXXXXX")
@@ -355,12 +354,20 @@ describe("App", () => {
           );
         });
     });
-    test("Status: 400 invalid topic", () => {
+    test("Status: 200 valid topic but no data", () => {
       return request(app)
-        .get("/api/articles?sort_by=title&topic=XXXXXX")
-        .expect(400)
+        .get("/api/articles?sort_by=title&topic=paper")
+        .expect(200)
         .then(({ body }) => {
-          expect(body.msg).toBe("No topic found");
+          expect(body.articles).toEqual([]);
+        });
+    });
+    test("Status: 404 topic not found for topic input that is not in the database", () => {
+      return request(app)
+        .get("/api/articles?sort_by=title&topic=XXXX")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toEqual("Topic not found");
         });
     });
     test("Status 404: When inputting an valid article id that doesn't exist, should receive 404", () => {
@@ -431,7 +438,7 @@ describe("App", () => {
         .send(commentTest)
         .expect(201)
         .then(({ body }) => {
-          expect(body.insertComment[0]).toMatchObject({
+          expect(body.comment[0]).toMatchObject({
             body: expect.any(String),
             votes: expect.any(Number),
             author: expect.any(String),
@@ -452,7 +459,7 @@ describe("App", () => {
         .send(commentTest)
         .expect(201)
         .then(({ body }) => {
-          expect(body.insertComment[0]).toMatchObject({
+          expect(body.comment[0]).toMatchObject({
             body: expect.any(String),
             votes: expect.any(Number),
             author: expect.any(String),

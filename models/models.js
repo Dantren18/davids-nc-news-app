@@ -42,6 +42,7 @@ exports.getArticlesModel = (sort_by = "created_at", order = "desc", topic) => {
       msg: "Invalid sort query - you can sort by title, topic, author, created_at, votes, or article_id",
     });
   }
+
   if (!["asc", "desc"].includes(order)) {
     return Promise.reject({
       status: 400,
@@ -54,17 +55,19 @@ exports.getArticlesModel = (sort_by = "created_at", order = "desc", topic) => {
   COUNT(comments.article_id) AS comment_count FROM articles 
   LEFT JOIN comments ON articles.article_id = comments.article_id`;
 
-  if (topic) {
+  if (
+    ["mitch", "cats", "paper", "coding", "football", "cooking"].includes(topic)
+  ) {
     queryValues.push(topic);
     queryStr += ` WHERE topic = $1`;
+  } else if (topic !== undefined) {
+    return Promise.reject({ status: 404, msg: "Topic not found" });
   }
+
   order = order.toUpperCase();
   queryStr += ` GROUP BY articles.article_id
   ORDER BY ${sort_by} ${order};`;
   return db.query(queryStr, queryValues).then(({ rows }) => {
-    if (rows.length === 0) {
-      return Promise.reject({ status: 400, msg: "No topic found" });
-    }
     return rows;
   });
 };

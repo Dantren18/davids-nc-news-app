@@ -79,8 +79,8 @@ exports.postCommentController = (req, res, next) => {
   const { article_id } = req.params;
   const comment = req.body;
   postCommentsModel(article_id, comment)
-    .then((insertComment) => {
-      res.status(201).send({ insertComment });
+    .then((comment) => {
+      res.status(201).send({ comment });
     })
     .catch((err) => {
       next(err);
