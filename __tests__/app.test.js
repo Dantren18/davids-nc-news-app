@@ -93,8 +93,9 @@ describe("App", () => {
         .get("/api/articles/1")
         .expect(200)
         .then(({ body }) => {
-          expect(Object.keys(body.article[0]).length).toEqual(8);
+          expect(Object.keys(body.article).length).toEqual(8);
           expect(typeof body).toEqual("object");
+          expect(typeof body.article).toEqual("object");
         });
     });
     test("Status 200: Correct data should be returned for ID 1", () => {
@@ -102,18 +103,16 @@ describe("App", () => {
         .get("/api/articles/1")
         .expect(200)
         .then(({ body }) => {
-          expect(body.article).toEqual([
-            {
-              article_id: 1,
-              author: "butter_bridge",
-              body: "I find this existence challenging",
-              comment_count: "11",
-              created_at: "2020-07-09T21:11:00.000Z",
-              title: "Living in the shadow of a great man",
-              topic: "mitch",
-              votes: 100,
-            },
-          ]);
+          expect(body.article).toEqual({
+            article_id: 1,
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            comment_count: "11",
+            created_at: "2020-07-09T21:11:00.000Z",
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            votes: 100,
+          });
         });
     });
     test("Status 200: Article with 0 comments correctly returns", () => {
@@ -121,18 +120,16 @@ describe("App", () => {
         .get("/api/articles/4")
         .expect(200)
         .then(({ body }) => {
-          expect(body.article).toEqual([
-            {
-              article_id: 4,
-              author: "rogersop",
-              body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
-              comment_count: "0",
-              created_at: "2020-05-06T02:14:00.000Z",
-              title: "Student SUES Mitch!",
-              topic: "mitch",
-              votes: 0,
-            },
-          ]);
+          expect(body.article).toEqual({
+            article_id: 4,
+            author: "rogersop",
+            body: "We all love Mitch and his wonderful, unique typing style. However, the volume of his typing has ALLEGEDLY burst another students eardrums, and they are now suing for damages",
+            comment_count: "0",
+            created_at: "2020-05-06T02:14:00.000Z",
+            title: "Student SUES Mitch!",
+            topic: "mitch",
+            votes: 0,
+          });
         });
     });
     test("Status 200: Correct data should be returned for ID 3", () => {
@@ -140,18 +137,16 @@ describe("App", () => {
         .get("/api/articles/3")
         .expect(200)
         .then(({ body }) => {
-          expect(body.article).toEqual([
-            {
-              article_id: 3,
-              author: "icellusedkars",
-              body: "some gifs",
-              comment_count: "2",
-              created_at: "2020-11-03T09:12:00.000Z",
-              title: "Eight pug gifs that remind me of mitch",
-              topic: "mitch",
-              votes: 0,
-            },
-          ]);
+          expect(body.article).toEqual({
+            article_id: 3,
+            author: "icellusedkars",
+            body: "some gifs",
+            comment_count: "2",
+            created_at: "2020-11-03T09:12:00.000Z",
+            title: "Eight pug gifs that remind me of mitch",
+            topic: "mitch",
+            votes: 0,
+          });
         });
     });
   });
@@ -163,17 +158,15 @@ describe("App", () => {
         .send(incVotes)
         .expect(200)
         .then(({ body }) => {
-          expect(body.article).toEqual([
-            {
-              article_id: 1,
-              title: "Living in the shadow of a great man",
-              body: "I find this existence challenging",
-              votes: 101,
-              topic: "mitch",
-              author: "butter_bridge",
-              created_at: "2020-07-09T21:11:00.000Z",
-            },
-          ]);
+          expect(body.article).toEqual({
+            article_id: 1,
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: "2020-07-09T21:11:00.000Z",
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            votes: 101,
+          });
         });
     });
     test("Status 200: Should decrease vote count by 1 returning update article and 200 status code", () => {
@@ -183,17 +176,15 @@ describe("App", () => {
         .send(incVotes)
         .expect(200)
         .then(({ body }) => {
-          expect(body.article).toEqual([
-            {
-              article_id: 3,
-              title: "Eight pug gifs that remind me of mitch",
-              body: "some gifs",
-              votes: -1,
-              topic: "mitch",
-              author: "icellusedkars",
-              created_at: "2020-11-03T09:12:00.000Z",
-            },
-          ]);
+          expect(body.article).toEqual({
+            article_id: 3,
+            author: "icellusedkars",
+            body: "some gifs",
+            created_at: "2020-11-03T09:12:00.000Z",
+            title: "Eight pug gifs that remind me of mitch",
+            topic: "mitch",
+            votes: -1,
+          });
         });
     });
     test("Status 400 - inc_vote value is not a number in request body", () => {
@@ -247,17 +238,15 @@ describe("App", () => {
         .send({ inc_votes: 1 })
         .expect(200)
         .then(({ body }) => {
-          expect(body.article).toEqual([
-            {
-              article_id: 1,
-              author: "butter_bridge",
-              body: "I find this existence challenging",
-              created_at: "2020-07-09T21:11:00.000Z",
-              title: "Living in the shadow of a great man",
-              topic: "mitch",
-              votes: 101,
-            },
-          ]);
+          expect(body.article).toEqual({
+            article_id: 1,
+            author: "butter_bridge",
+            body: "I find this existence challenging",
+            created_at: "2020-07-09T21:11:00.000Z",
+            title: "Living in the shadow of a great man",
+            topic: "mitch",
+            votes: 101,
+          });
         });
     });
   });
@@ -438,7 +427,7 @@ describe("App", () => {
         .send(commentTest)
         .expect(201)
         .then(({ body }) => {
-          expect(body.comment[0]).toMatchObject({
+          expect(body.comment).toMatchObject({
             body: expect.any(String),
             votes: expect.any(Number),
             author: expect.any(String),
@@ -459,7 +448,7 @@ describe("App", () => {
         .send(commentTest)
         .expect(201)
         .then(({ body }) => {
-          expect(body.comment[0]).toMatchObject({
+          expect(body.comment).toMatchObject({
             body: expect.any(String),
             votes: expect.any(Number),
             author: expect.any(String),
