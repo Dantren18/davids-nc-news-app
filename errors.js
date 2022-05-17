@@ -6,6 +6,14 @@ exports.handleCustomError = (err, req, res, next) => {
   }
 };
 
+exports.handlePSQLError = (err, req, res, next) => {
+  if (err.code === "23505") {
+    res
+      .status(400)
+      .send({ msg: "Value already exists!" });
+  } else next(err);
+};
+
 exports.handle400Error = (err, req, res, next) => {
   if (err.code === "22P02") {
     res.status(400).send({ msg: "Invalid ID type" });
