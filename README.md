@@ -33,8 +33,8 @@ Minimum versions needed to run this project are:
 Enter the following commands in your terminal to clone the repository and install all the required dependencies.
 
 ```bash
-$ git clone https://github.com/Dantren18/be-nc-news.git
-$ code be-nc-news
+$ git clone https://github.com/Dantren18/davids-nc-news-app.git
+$ code davids-nc-news-app
 $ npm i
 ```
 
