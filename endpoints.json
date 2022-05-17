@@ -1,6 +1,6 @@
-{
+{ "Endpoints": {
   "GET /api": {
-    "description": "serves up a json representation of all the available endpoints of the api"
+    "description": "Responds with a json representation of all the available endpoints of the api"
   },
   "GET /api/topics": {
     "description": "serves an array of all topics",
@@ -10,8 +10,8 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all topics",
-    "queries": ["author", "topic", "sort_by", "order"],
+    "description": "Responds with article object",
+    "queries": ["topic", "sort_by", "order"],
     "exampleResponse": {
       "articles": [
         {
@@ -23,5 +23,155 @@
         }
       ]
     }
+  },
+  "GET /api/articles/:article_id": {
+    "description": "Responds with an article object that matches the article_id",
+    "exampleResponse": {
+      "article": {
+        "article_id": 1,
+        "title": "Seafood substitutions are increasing",
+        "topic": "cooking",
+        "author": "weegembump",
+        "body": "Text from the article..",
+        "created_at": 1527695953341,
+        "votes": 0,
+        "comment_count": "8"
+      }
+    }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "Request body accepts a vote count object and increases the given article's vote count, responds with the updated article.",
+    "request body": { "inc_votes": "newVote" },
+    "exampleResponse": {
+      "article": {
+        "article_id": 1,
+        "title": "Seafood substitutions are increasing",
+        "topic": "cooking",
+        "author": "weegembump",
+        "body": "Text from the article..",
+        "created_at": 1527695953341,
+        "votes": 0,
+        "comment_count": "8"
+      }
+    }
+  },
+  "GET /api/articles/:article_id/comments": {
+    "description": "Responds with an array of comments for the given article_id",
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 31,
+          "author": "weegembump",
+          "article_id": 1,
+          "votes": 11,
+          "created_at": "2020-09-26T17:16:00.000Z",
+          "body": "Sit sequi odio suscipit. Iure quisquam qui alias distinctio eos officia enim aut sit. Corrupti ut praesentium ut iste earum itaque qui. Dolores in ab rerum consequuntur. Id ab aliquid autem dolore."
+        }
+      ]
+    }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "Takes an object containing a comment username and body and responds with the posted comment",
+    "request body": {
+      "username": "butter_bridge",
+      "body": "this is a great comment"
+    },
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 19,
+        "author": "butter_bridge",
+        "article_id": 1,
+        "votes": 0,
+        "created_at": "2022-01-20T16:56:36.197Z",
+        "body": "this is a great comment"
+      }
+    }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "Deletes the comment corresponding to the passed comment_id, responds with status 204 and no content",
+    "exampleResponse": {}
+  },
+
+  "GET /api/users": {
+    "description": "serves an array of users",
+    "queries": [],
+    "exampleResponse": {
+      "users": [
+        {
+          "username": "tickle122"
+        },
+        {
+          "username": "grumpy19"
+        }
+      ]
+    }
+  },
+
+  "GET /api/users/:username": {
+    "description": "serves a single user object",
+    "queries": [],
+    "exampleResponse": {
+      "user": {
+        "username": "tickle122",
+        "avatar_url": "https://vignette.wikia.nocookie.net/mrmen/images/d/d6/Mr-Tickle-9a.png/revision/latest?cb=20180127221953",
+        "name": "Tom Tickle"
+      }
+    }
+  },
+
+  "PATCH /api/comments/:comment_id": {
+    "description": "Accepts an object in the form { inc_votes: newVote }, newVote will indicate how much the votes property in the database should be updated by.Responds withbthe updated comment.",
+    "queries": [],
+    "exampleOfTheBodySent": {
+      "inc_votes": -1
+    },
+    "exampleResponse": {
+      "comment": {
+        "body": "Quia nemo est. Maiores animi architecto ad nihil sapiente. Odio in maxime nam assumenda tempora et nisi. Impedit quidem cum neque libero sequi et et impedit. Dignissimos ut molestiae laborum rerum error distinctio quasi hic consectetur. Odio vel qui necessitatibus perspiciatis ipsum quod excepturi saepe.",
+        "votes": 0,
+        "author": "jessjelly",
+        "article_id": 22,
+        "created_at": 1580527320000
+      }
+    }
+  },
+
+  "POST /api/articles": {
+    "description": "request body accepts an object with the following properties: author (which is the username from the users table), title, body, topic. The new article is then posted and the api response with the newly added article.post an article",
+    "queries": [],
+    "exampleOfTheBodySent": {
+      "title": "Tom officially caught Jerry",
+      "topic": "mitch",
+      "author": "butter_bridge",
+      "body": "The event everyone was waiting for."
+    },
+    "exampleResponse": {
+      "article": {
+        "title": "Living in the shadow of a great man",
+        "topic": "mitch",
+        "author": "butter_bridge",
+        "body": "I find this existence challenging",
+        "votes": 100,
+        "article_id": 13,
+        "comment_count": 0,
+        "created_at": 1527695953341
+      }
+    }
+  },
+
+  "POST /api/topics": {
+    "description": "Request body accepts a new topic object to add. Response with the newly created topic object",
+    "queries": [],
+    "exampleOfTheBodySent": {
+      "slug": "cooking",
+      "description": "Hey good looking, what you got cooking?"
+    },
+    "exampleResponse": {
+      "topic": {
+        "slug": "cooking",
+        "description": "Hey good looking, what you got cooking?"
+      }
+    }
   }
+}
 }

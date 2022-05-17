@@ -1,50 +1,28 @@
 const express = require("express");
 const cors = require("cors");
-const {
-  getTopicsController,
-  getArticleByIDController,
-  getCommentsController,
-  patchArticleByIdController,
-  getUsersController,
-  getArticlesController,
-  postCommentController,
-  deleteCommentsController,
-  getApiController,
-} = require("./controllers/controllers.js");
 const app = express();
+const apiRouter = require("./routers/api.router");
 
-const {
+const {handlePSQLError,
   handleCustomError,
   handleServerError,
   handle400Error,
   handle404Error,
 } = require("./errors");
 
+app.get("/", (req, res, next) => {
+  res.status(200).send({ msg: "Welcome to David's NC-news app!" });
+});
+
 app.use(cors());
 
 app.use(express.json());
 
-app.get("/api", getApiController);
-
-///API/TOPICS
-app.get("/api/topics", getTopicsController);
-
-///API/ARTICLES
-app.get("/api/articles/:article_id", getArticleByIDController);
-app.get("/api/articles", getArticlesController);
-
-app.patch("/api/articles/:article_id", patchArticleByIdController);
-
-///API/USERS
-app.get("/api/users", getUsersController);
-
-////COMMENTS
-app.get("/api/articles/:article_id/comments", getCommentsController);
-app.post("/api/articles/:article_id/comments", postCommentController);
-app.delete("/api/comments/:comment_id", deleteCommentsController);
+app.use("/api", apiRouter);
 
 ///ERRORS
 
+app.use(handlePSQLError);
 app.use(handleCustomError);
 app.use(handle400Error);
 app.use(handle404Error);
